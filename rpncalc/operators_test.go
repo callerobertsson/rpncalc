@@ -15,6 +15,8 @@ func TestUnaryOp(t *testing.T) {
 	}{
 		{opNegate, 1, -1, nil},
 		{opNegate, -3.14, 3.14, nil},
+		{opInverse, 10.0, 0.1, nil},
+		{opInverse, 0.0, 0.0, errDivisionByZero},
 		// TODO: Add more cases for unary operators
 	}
 
@@ -22,7 +24,7 @@ func TestUnaryOp(t *testing.T) {
 		got, err := c.f(c.v)
 
 		if err != c.err {
-			t.Errorf("Case %d: Expected error %q, but got %q", i, c.err, err)
+			t.Errorf("Case %d: Expected error %v, but got %v", i, c.err, err)
 		}
 
 		if got != c.exp {
@@ -59,7 +61,7 @@ func TestBinaryOp(t *testing.T) {
 		got, err := c.f(c.x, c.y)
 
 		if err != c.err {
-			t.Errorf("Case %d: Expected error %q, but got %q", i, c.err, err)
+			t.Errorf("Case %d: Expected error %v, but got %v", i, c.err, err)
 		}
 
 		if !almostEqual(got, c.exp) {
