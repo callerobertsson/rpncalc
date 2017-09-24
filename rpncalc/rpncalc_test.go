@@ -2,19 +2,6 @@ package rpncalc
 
 import "testing"
 
-/*
-	Enter(string) error
-	Val() (float64, error)
-	Stack() []float64
-	Regs() []float64
-	Log() []string
-	ClearVal()
-	ClearStack()
-	ClearReg(i int) error
-	ClearRegs()
-	ClearLog()
-*/
-
 func TestNew(t *testing.T) {
 	r := New()
 

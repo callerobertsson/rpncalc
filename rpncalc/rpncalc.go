@@ -29,6 +29,7 @@ const (
 )
 
 var (
+	errIndexOutOfRange  = errors.New("index out of range")
 	errOverflow         = errors.New("overflow")
 	errDivisionByZero   = errors.New("division by zero")
 	errUnknownOperation = errors.New("unknown operation")
@@ -82,6 +83,8 @@ func (r *RpnCalc) Enter(expr string) error {
 		err = r.binaryOp(opMultiplication)
 	case "/", "div":
 		err = r.binaryOp(opDivision)
+	case "sw", "swap":
+		err = r.stackSwap(0, 1)
 	default:
 		r.log = append(r.log, "Unknown operation: "+expr)
 		return errUnknownOperation
