@@ -147,22 +147,14 @@ func TestValAndClear(t *testing.T) {
 		t.Fatalf("Could not enter expression, got error %v", err)
 	}
 
-	val, err := r.Val()
-	if err != nil {
-		t.Fatalf("Could not get value, got error %v", err)
-	}
-
+	val := r.Val()
 	if val != expVal {
 		t.Fatalf("Expected value %v, but got %v", expVal, val)
 	}
 
 	r.ClearVal()
 
-	val, err = r.Val()
-	if err != nil {
-		t.Fatalf("Could not get value, got error %v", err)
-	}
-
+	val = r.Val()
 	if val != 0.0 {
 		t.Fatalf("Expected value to be cleared, but got %v", val)
 	}

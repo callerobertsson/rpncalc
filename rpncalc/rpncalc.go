@@ -41,7 +41,6 @@ type RpnCalc struct {
 	stack []float64
 	regs  []float64
 	log   []string
-	err   error
 }
 
 // New creates a new RpnCalc with default settings
@@ -132,11 +131,8 @@ func (r *RpnCalc) Enter(input string) error {
 }
 
 // Val gets the first value on the stack, the display value
-func (r *RpnCalc) Val() (float64, error) {
-	if r.err != nil {
-		return 0.0, r.err
-	}
-	return r.stack[0], nil
+func (r *RpnCalc) Val() float64 {
+	return r.stack[0]
 }
 
 // Stack returns the current stack of values

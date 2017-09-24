@@ -42,7 +42,7 @@ func main() {
 
 		fmt.Printf("Stack: %v\n", r.Stack())
 		msg := ""
-		v, _ := r.Val()
+		v := r.Val()
 		if err != nil {
 			msg = err.Error()
 		}
