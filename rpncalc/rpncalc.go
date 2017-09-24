@@ -55,48 +55,60 @@ func New() *RpnCalc {
 }
 
 // Enter takes some input, number, operator, or command, and tries to parse it
-func (r *RpnCalc) Enter(expr string) error {
-	expr = strings.ToLower(strings.TrimSpace(expr))
+func (r *RpnCalc) Enter(input string) error {
 
-	// Try to parse a float64
-	val, err := strconv.ParseFloat(expr, 64)
-	if err == nil {
-		r.log = append(r.log, fmt.Sprintf("%v", val))
-		r.stack = enter(r.stack, val)
-		return nil
+	// Split input into tokens
+	ts := strings.Split(input, " ")
+	for _, t := range ts {
+		t = strings.ToLower(strings.TrimSpace(t))
+		if t == "" {
+			continue
+		}
+
+		// Try to parse a float64
+		val, err := strconv.ParseFloat(t, 64)
+		if err == nil {
+			r.log = append(r.log, fmt.Sprintf("%v", val))
+			r.stack = enter(r.stack, val)
+			continue
+		}
+		err = nil
+
+		// Try to find a matching operator
+		switch t {
+		case "!", "neg":
+			err = r.unaryOp(opNegate)
+		case "inv":
+			err = r.unaryOp(opInverse)
+		case "sq", "square":
+			err = r.unaryOp(opSquare)
+		case "+", "add":
+			err = r.binaryOp(opAddition)
+		case "-", "sub":
+			err = r.binaryOp(opSubtraction)
+		case "*", "mul", "mult":
+			err = r.binaryOp(opMultiplication)
+		case "/", "div":
+			err = r.binaryOp(opDivision)
+		case "sw", "swap":
+			err = r.stackSwap(0, 1)
+		default:
+			r.log = append(r.log, "Unknown operation: "+t)
+			return errUnknownOperation
+		}
+
+		r.log = append(r.log, t)
+		if err != nil {
+			r.log = append(r.log, "Error: "+err.Error())
+		}
+		r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
+
+		if err != nil {
+			return err
+		}
 	}
-	err = nil
 
-	// Try to find a matching operator
-	switch expr {
-	case "!", "neg":
-		err = r.unaryOp(opNegate)
-	case "inv":
-		err = r.unaryOp(opInverse)
-	case "sq", "square":
-		err = r.unaryOp(opSquare)
-	case "+", "add":
-		err = r.binaryOp(opAddition)
-	case "-", "sub":
-		err = r.binaryOp(opSubtraction)
-	case "*", "mul", "mult":
-		err = r.binaryOp(opMultiplication)
-	case "/", "div":
-		err = r.binaryOp(opDivision)
-	case "sw", "swap":
-		err = r.stackSwap(0, 1)
-	default:
-		r.log = append(r.log, "Unknown operation: "+expr)
-		return errUnknownOperation
-	}
-
-	r.log = append(r.log, expr)
-	if err != nil {
-		r.log = append(r.log, "Error: "+err.Error())
-	}
-	r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
-
-	return err
+	return nil
 }
 
 // Val gets the first value on the stack, the display value

@@ -21,25 +21,23 @@ func main() {
 	printPrompt(0.0, "enter q to quit")
 	for scanner.Scan() {
 		var err error
-		words := strings.TrimSpace(scanner.Text())
+		input := strings.TrimSpace(scanner.Text())
 
-		for _, word := range strings.Split(words, " ") {
-			switch word {
-			case "":
-				continue
-			case "q", "quit":
-				os.Exit(0)
-			case "?", "help":
-				printHelp()
-			case "h", "history":
-				printLog(r)
-			case "cs":
-				r.ClearStack()
-			case "cr":
-				r.ClearRegs()
-			default:
-				err = r.Enter(word)
-			}
+		switch input {
+		case "":
+			continue
+		case "q", "quit":
+			os.Exit(0)
+		case "?", "help":
+			printHelp()
+		case "h", "history":
+			printLog(r)
+		case "cs":
+			r.ClearStack()
+		case "cr":
+			r.ClearRegs()
+		default:
+			err = r.Enter(input)
 		}
 
 		fmt.Printf("Regs:  %v\n", r.Regs())

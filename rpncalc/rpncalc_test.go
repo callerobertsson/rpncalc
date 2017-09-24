@@ -46,6 +46,7 @@ func TestEnterVal(t *testing.T) {
 		{[]string{"123", "10", "/"}, []float64{12.3, 0.0, 0.0, 0.0}, nil},
 		{[]string{"123", "10", "+"}, []float64{133.0, 0.0, 0.0, 0.0}, nil},
 		{[]string{"1234", "100", "10", "/", "/"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
+		{[]string{"1234 100 10 / /"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
 
 		// TODO: Add testcases when new functionality comes along
 
