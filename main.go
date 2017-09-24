@@ -32,10 +32,6 @@ func main() {
 			printHelp()
 		case "h", "history":
 			printLog(r)
-		case "cs":
-			r.ClearStack()
-		case "cr":
-			r.ClearRegs()
 		default:
 			err = r.Enter(input)
 		}

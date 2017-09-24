@@ -90,6 +90,10 @@ func (r *RpnCalc) Enter(input string) error {
 			err = r.binaryOp(opMultiplication)
 		case "/", "div":
 			err = r.binaryOp(opDivision)
+		case "cs", "clearstack":
+			r.ClearStack()
+		case "cr", "clearregs":
+			r.ClearRegs()
 		case "sw", "swap":
 			err = r.stackSwap(0, 1)
 		default:
