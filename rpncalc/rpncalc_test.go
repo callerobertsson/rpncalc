@@ -201,13 +201,31 @@ func TestRegsAndClear(t *testing.T) {
 		t.Fatalf("Bad register values expeted r1 = 1 and r2 = 2, but got %v", regs)
 	}
 
+	// Clear register 2
+	err = r.ClearReg(2)
+	if regs[2] != 0.0 {
+		t.Errorf("Expected register 2 to be cleared, but it contained %v", regs[2])
+	}
+
+	// Try to clear invalid register should fail
+	err = r.ClearReg(11)
+	if err != errInvalidRegister {
+		t.Errorf("Expected %v, but got %v when clearing invalid register #11", errInvalidRegister, err)
+	}
+
+	// Try to clear another invalid register should fail
+	err = r.ClearReg(-1)
+	if err != errInvalidRegister {
+		t.Errorf("Expected %v, but got %v when clearing invalid register #-1", errInvalidRegister, err)
+	}
+
+	// Clear all registers
 	r.ClearRegs()
 	for i, r := range r.Regs() {
 		if r != 0.0 {
 			t.Errorf("Reg %v contains %v, expected it to be cleared", i, r)
 		}
 	}
-
 }
 
 func TestInvalidRegisters(t *testing.T) {
