@@ -30,13 +30,14 @@ func main() {
 			os.Exit(0)
 		case "?", "help":
 			printHelp()
+		case "rs", "regs", "registers":
+			printRegisters(r)
 		case "h", "history":
 			printLog(r)
 		default:
 			err = r.Enter(input)
 		}
 
-		fmt.Printf("Regs:  %v\n", r.Regs())
 		fmt.Printf("Stack: %v\n", r.Stack())
 		msg := ""
 		v, _ := r.Val()
@@ -58,6 +59,13 @@ func printPrompt(v float64, msg string) {
 		return
 	}
 	fmt.Printf("rpncalc %q > ", msg)
+}
+
+func printRegisters(r *rpncalc.RpnCalc) {
+	fmt.Printf("Registers:\n")
+	for i, r := range r.Regs() {
+		fmt.Printf("  %2d: %v\n", i, r)
+	}
 }
 
 func printLog(r *rpncalc.RpnCalc) {
