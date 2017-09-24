@@ -94,6 +94,7 @@ func (r *RpnCalc) Enter(expr string) error {
 	if err != nil {
 		r.log = append(r.log, "Error: "+err.Error())
 	}
+	r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
 
 	return err
 }

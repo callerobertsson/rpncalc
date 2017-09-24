@@ -12,8 +12,6 @@ func (r *RpnCalc) unaryOp(f func(float64) (float64, error)) error {
 		return err
 	}
 	r.stack[0] = v
-	r.log = append(r.log, fmt.Sprintf(">> %v", v))
-
 	return nil
 }
 
@@ -27,8 +25,6 @@ func (r *RpnCalc) binaryOp(f func(float64, float64) (float64, error)) error {
 
 	r.stack = rolldown(r.stack)
 	r.stack[0] = v
-	r.log = append(r.log, fmt.Sprintf(">> %v", v))
-
 	return nil
 }
 
