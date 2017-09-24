@@ -7,6 +7,67 @@ import (
 
 func TestUnaryOp(t *testing.T) {
 
+	nice := func(float64) (float64, error) {
+		return 1.0, nil
+	}
+	evil := func(float64) (float64, error) {
+		return 0.0, errOverflow
+	}
+
+	cases := []struct {
+		f   func(float64) (float64, error)
+		val float64
+		err error
+	}{
+		{nice, 1.0, nil},
+		{evil, 0.0, errOverflow},
+	}
+
+	for _, c := range cases {
+		r := New()
+
+		err := r.unaryOp(c.f)
+		if err != c.err {
+			t.Errorf("Expected result %v, but got %v", c.err, err)
+		}
+		if r.Stack()[0] != c.val {
+			t.Errorf("Expected value %v, but got %v", c.val, r.Stack()[0])
+		}
+	}
+}
+func TestBinaryOp(t *testing.T) {
+
+	nice := func(float64, float64) (float64, error) {
+		return 1.0, nil
+	}
+	evil := func(float64, float64) (float64, error) {
+		return 0.0, errOverflow
+	}
+
+	cases := []struct {
+		f   func(float64, float64) (float64, error)
+		val float64
+		err error
+	}{
+		{nice, 1.0, nil},
+		{evil, 0.0, errOverflow},
+	}
+
+	for _, c := range cases {
+		r := New()
+
+		err := r.binaryOp(c.f)
+		if err != c.err {
+			t.Errorf("Expected result %v, but got %v", c.err, err)
+		}
+		if r.Stack()[0] != c.val {
+			t.Errorf("Expected value %v, but got %v", c.val, r.Stack()[0])
+		}
+	}
+}
+
+func TestUnaryOpBasicOperations(t *testing.T) {
+
 	cases := []struct {
 		f   func(float64) (float64, error)
 		v   float64

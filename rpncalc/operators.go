@@ -1,10 +1,7 @@
 // Package rpncalc operators
 package rpncalc
 
-import (
-	"fmt"
-	"math"
-)
+import "math"
 
 func (r *RpnCalc) unaryOp(f func(float64) (float64, error)) error {
 	v, err := f(r.stack[0])
@@ -42,10 +39,8 @@ func opInverse(x float64) (float64, error) {
 
 func opSquare(x float64) (float64, error) {
 	if x > math.Sqrt(math.MaxFloat64) {
-		fmt.Printf("opSquare(%v) = overflow\n", x)
 		return 0.0, errOverflow
 	}
-	fmt.Printf("opSquare(%v) = %v\n", x, x*x)
 	return x * x, nil
 }
 

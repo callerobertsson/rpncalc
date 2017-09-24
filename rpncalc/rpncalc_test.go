@@ -1,6 +1,9 @@
 package rpncalc
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestNew(t *testing.T) {
 	r := New()
@@ -37,22 +40,70 @@ func TestNew(t *testing.T) {
 
 func TestEnterVal(t *testing.T) {
 	cases := []struct {
+		name  string
 		input []string
 		stack []float64
 		err   error
 	}{
-		{[]string{"123", "234"}, []float64{234.0, 123.0, 0.0, 0.0}, nil},
-		{[]string{"123", "foo"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownOperation},
-		{[]string{"123", "10", "/"}, []float64{12.3, 0.0, 0.0, 0.0}, nil},
-		{[]string{"123", "10", "+"}, []float64{133.0, 0.0, 0.0, 0.0}, nil},
-		{[]string{"1234", "100", "10", "/", "/"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
-		{[]string{"1234 100 10 / /"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
+		// Unary stuff
+		{"negate value",
+			[]string{"1 2 3 4 !"}, []float64{-4, 3, 2, 1}, nil},
+		{"inverse value",
+			[]string{"1 2 3 4 inv"}, []float64{0.25, 3, 2, 1}, nil},
+		{"sqare a number",
+			[]string{"5 sq"},
+			[]float64{25, 0, 0, 0}, nil},
+
+		// Binary stuff
+		{"enter 2 vals",
+			[]string{"123", "234"}, []float64{234.0, 123.0, 0.0, 0.0}, nil},
+		{"divide",
+			[]string{"123", "10", "/"}, []float64{12.3, 0.0, 0.0, 0.0}, nil},
+		{"add",
+			[]string{"123", "10", "+"}, []float64{133.0, 0.0, 0.0, 0.0}, nil},
+		{"double divide",
+			[]string{"1234", "100", "10", "/", "/"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
+		{"single string double divide",
+			[]string{"1234 100 10 / /"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
+		{"multiple ops",
+			[]string{"1234 100 * 1000 / 1 -"}, []float64{122.4, 0.0, 0.0, 0.0}, nil},
+		{"swap value",
+			[]string{"1 2 3 4 sw"}, []float64{3, 4, 2, 1}, nil},
+
+		// Input sanity
+		{"ignore spaces",
+			[]string{"   1  2  3  4 "}, []float64{4, 3, 2, 1}, nil},
+
+		// Stack operations
+		{"clear stack",
+			[]string{"1 2 3 4 cs"}, []float64{0, 0, 0, 0}, nil},
+
+		// Regs stuff
+		{"clear regs don't change stack",
+			[]string{"1 2 3 4 cr"}, []float64{4, 3, 2, 1}, nil},
+		{"regs store don't change stack",
+			[]string{"1 2 3 4 rs5"}, []float64{4, 3, 2, 1}, nil},
+		{"regs clear don't change stack",
+			[]string{"1 2 3 4 rc1"}, []float64{4, 3, 2, 1}, nil},
+		{"regs retrive change stack",
+			[]string{"1 2 3 4 rr9"}, []float64{0, 4, 3, 2}, nil},
+		{"regs store invalid reg fails",
+			[]string{"1 2 3 4 rs99"}, []float64{4, 3, 2, 1}, errInvalidRegister},
+		{"regs clear invalid reg fails",
+			[]string{"1 2 3 4 rcx"}, []float64{4, 3, 2, 1}, errInvalidRegister},
+		{"regs retrive invalid reg fails",
+			[]string{"1 2 3 4 rrapa"}, []float64{4, 3, 2, 1}, errInvalidRegister},
+
+		// Unknown operations
+		{"unknown op",
+			[]string{"123", "foo"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownOperation},
+		{"fail in middle",
+			[]string{"123 foo 321"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownOperation},
 
 		// TODO: Add testcases when new functionality comes along
-
 	}
 
-	for ci, c := range cases {
+	for _, c := range cases {
 		r := New()
 
 		var err error
@@ -61,7 +112,7 @@ func TestEnterVal(t *testing.T) {
 		for i := 0; i < len(c.input)-1; i++ {
 			err = r.Enter(c.input[i])
 			if err != nil {
-				t.Errorf("Case %d: Error in step %d: %v", ci, i, err)
+				t.Errorf("Case %v: Error in step %d: %v", c.name, i, err)
 				break
 			}
 		}
@@ -73,15 +124,117 @@ func TestEnterVal(t *testing.T) {
 		// Enter final operation
 		err = r.Enter(c.input[len(c.input)-1])
 		if err != c.err {
-			t.Errorf("Case %d: Expected error %v, but got %q for %v", ci, c.err, err, c.input[len(c.input)-1])
+			t.Errorf("Case %v: Expected error %v, but got %q for %v", c.name, c.err, err, c.input[len(c.input)-1])
 			continue
 		}
 
 		// Check stack
 		for i := range c.stack {
 			if c.stack[i] != r.stack[i] {
-				t.Errorf("Case %d: Expected stack %v, but got %v", ci, c.stack, r.stack)
+				t.Errorf("Case %v: Expected stack %v, but got %v", c.name, c.stack, r.stack)
 			}
 		}
 	}
+}
+
+func TestValAndClear(t *testing.T) {
+	expVal := 4.0
+
+	r := New()
+
+	err := r.Enter("1 2 3 4")
+	if err != nil {
+		t.Fatalf("Could not enter expression, got error %v", err)
+	}
+
+	val, err := r.Val()
+	if err != nil {
+		t.Fatalf("Could not get value, got error %v", err)
+	}
+
+	if val != expVal {
+		t.Fatalf("Expected value %v, but got %v", expVal, val)
+	}
+
+	r.ClearVal()
+
+	val, err = r.Val()
+	if err != nil {
+		t.Fatalf("Could not get value, got error %v", err)
+	}
+
+	if val != 0.0 {
+		t.Fatalf("Expected value to be cleared, but got %v", val)
+	}
+}
+
+func TestLogContentAndClear(t *testing.T) {
+
+	expLog := []string{"1", "2", "+", ">> 3", "3", "+", ">> 6"}
+
+	r := New()
+
+	err := r.Enter("1 2 + 3 +")
+	if err != nil {
+		t.Fatalf("Could not enter expression, got error %v", err)
+	}
+
+	l := r.Log()
+	if len(l) != len(expLog) {
+		t.Fatalf("Expected log length %v, but got %v", len(expLog), len(l))
+	}
+
+	if fmt.Sprintf("%v", l) != fmt.Sprintf("%v", expLog) {
+		t.Fatalf("Expected log %v, but got %v", expLog, l)
+	}
+
+	r.ClearLog()
+
+	if len(r.Log()) > 0 {
+		t.Fatalf("Expected empty log, but it has length %v and contains %v", len(r.Log()), r.Log())
+	}
+}
+
+func TestRegsAndClear(t *testing.T) {
+
+	r := New()
+
+	err := r.Enter("1 rs1 2 rs2")
+	if err != nil {
+		t.Fatalf("Faild to set valid registers, got error %v", err)
+	}
+
+	regs := r.Regs()
+	if regs[1] != 1 || regs[2] != 2 {
+		t.Fatalf("Bad register values expeted r1 = 1 and r2 = 2, but got %v", regs)
+	}
+
+	r.ClearRegs()
+	for i, r := range r.Regs() {
+		if r != 0.0 {
+			t.Errorf("Reg %v contains %v, expected it to be cleared", i, r)
+		}
+	}
+
+}
+
+func TestInvalidRegisters(t *testing.T) {
+
+	r := New()
+
+	err := r.Enter("1 rs10")
+	if err == nil {
+		t.Fatalf("Could set register 10, that should not be allowed")
+	}
+
+	err = r.Enter("rsapa")
+	if err == nil {
+		t.Fatalf("Could set register apa, that should not be allowed")
+	}
+
+	err = r.Enter("rs")
+	if err == nil {
+		t.Fatalf("Could set register with empty number, that should not be allowed")
+	}
+
 }

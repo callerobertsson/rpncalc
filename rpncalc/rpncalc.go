@@ -32,6 +32,7 @@ var (
 	errIndexOutOfRange  = errors.New("index out of range")
 	errOverflow         = errors.New("overflow")
 	errDivisionByZero   = errors.New("division by zero")
+	errInvalidRegister  = errors.New("invalid register")
 	errUnknownOperation = errors.New("unknown operation")
 )
 
@@ -74,28 +75,43 @@ func (r *RpnCalc) Enter(input string) error {
 		}
 		err = nil
 
+		in := func(t string, ms ...string) bool {
+			for _, m := range ms {
+				if m == t {
+					return true
+				}
+			}
+			return false
+		}
+
 		// Try to find a matching operator
-		switch t {
-		case "!", "neg":
+		switch {
+		case in(t, "!", "neg"):
 			err = r.unaryOp(opNegate)
-		case "inv":
+		case in(t, "inv"):
 			err = r.unaryOp(opInverse)
-		case "sq", "square":
+		case in(t, "sq", "square"):
 			err = r.unaryOp(opSquare)
-		case "+", "add":
+		case in(t, "+", "add"):
 			err = r.binaryOp(opAddition)
-		case "-", "sub":
+		case in(t, "-", "sub"):
 			err = r.binaryOp(opSubtraction)
-		case "*", "mul", "mult":
+		case in(t, "*", "mul", "mult"):
 			err = r.binaryOp(opMultiplication)
-		case "/", "div":
+		case in(t, "/", "div"):
 			err = r.binaryOp(opDivision)
-		case "cs", "clearstack":
+		case in(t, "cs", "clearstack"):
 			r.ClearStack()
-		case "cr", "clearregs":
+		case in(t, "cr", "clearregs"):
 			r.ClearRegs()
-		case "sw", "swap":
+		case in(t, "sw", "swap"):
 			err = r.stackSwap(0, 1)
+		case strings.HasPrefix(t, "rs"):
+			err = r.regParseAndStore(t)
+		case strings.HasPrefix(t, "rr"):
+			err = r.regParseAndRetrieve(t)
+		case strings.HasPrefix(t, "rc"):
+			err = r.regParseAndClear(t)
 		default:
 			r.log = append(r.log, "Unknown operation: "+t)
 			return errUnknownOperation
@@ -153,7 +169,7 @@ func (r *RpnCalc) ClearStack() {
 // ClearReg puts a zero value in the i:th position of the registers
 func (r *RpnCalc) ClearReg(i int) error {
 	if i < 0 || i > len(r.regs)-1 {
-		return fmt.Errorf("index out of range")
+		return errInvalidRegister
 	}
 	r.regs[i] = 0.0
 	return nil
