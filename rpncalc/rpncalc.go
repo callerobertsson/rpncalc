@@ -29,6 +29,7 @@ const (
 )
 
 var (
+	errOverflow         = errors.New("overflow")
 	errDivisionByZero   = errors.New("division by zero")
 	errUnknownOperation = errors.New("unknown operation")
 )
@@ -71,6 +72,8 @@ func (r *RpnCalc) Enter(expr string) error {
 		err = r.unaryOp(opNegate)
 	case "inv":
 		err = r.unaryOp(opInverse)
+	case "sq", "square":
+		err = r.unaryOp(opSquare)
 	case "+", "add":
 		err = r.binaryOp(opAddition)
 	case "-", "sub":

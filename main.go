@@ -60,7 +60,7 @@ func main() {
 
 func printPrompt(v float64, msg string) {
 	if msg == "" {
-		fmt.Printf("rpncalc %f > ", v)
+		fmt.Printf("rpncalc %v > ", v)
 		return
 	}
 	fmt.Printf("rpncalc %q > ", msg)
