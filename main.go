@@ -27,7 +27,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 
-	printPrompt(r, "")
+	prompt(r, "")
 	for scanner.Scan() {
 		var err error
 		var msg string
@@ -47,7 +47,7 @@ func main() {
 			msg = err.Error()
 		}
 
-		printPrompt(r, msg)
+		prompt(r, msg)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -55,13 +55,11 @@ func main() {
 	}
 }
 
-func printPrompt(r *rpncalc.RpnCalc, msg string) {
+func prompt(r *rpncalc.RpnCalc, msg string) {
 	if config.PrintStack {
-		fmt.Println("==================")
-		printStack(r)
-	} else {
-		fmt.Printf("%v", formatVal(r.Val()))
+		cmdStack(r)
 	}
+	fmt.Printf("%v", formatVal(r.Val()))
 
 	if msg == "" {
 		fmt.Printf(" > ")
@@ -70,72 +68,9 @@ func printPrompt(r *rpncalc.RpnCalc, msg string) {
 	fmt.Printf(" [%v] > ", msg)
 }
 
-func printStack(r *rpncalc.RpnCalc) {
-	for i := len(r.Stack()) - 1; i >= 0; i-- {
-		fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
-		if i != 0 {
-			fmt.Printf("\n")
-		}
-	}
-}
-
-func printRegisters(r *rpncalc.RpnCalc) {
-	for i, v := range r.Regs() {
-		fmt.Printf("  %2d: %v\n", i, formatVal(v))
-	}
-}
-
-func printLog(r *rpncalc.RpnCalc) {
-	if len(r.Log()) < 1 {
-		fmt.Println("  history is empty")
-		return
-	}
-	for i, l := range r.Log() {
-		fmt.Printf("  %4d: %v\n", len(r.Log())-i, l)
-	}
-}
-
 func formatVal(v float64) string {
 	f := fmt.Sprintf("%%.%vf", config.DisplayPrecision)
 	return fmt.Sprintf(f, v)
-}
-
-func printHelp() {
-	format := "  %20v: %v\n"
-	cmds := fmt.Sprintf(format, "Command", "Desciption")
-	for _, cmd := range commands {
-		cmds += fmt.Sprintf(format, strings.Join(cmd.names, ", "), cmd.description)
-	}
-
-	ops := "TBD"
-
-	fmt.Printf(`
-RPN Calc Help
-
-COMMANDS
-
-Commands are prefixed with a colon, ex ":quit" and must be entered first on a line.
-
-List of commands:
-
-%v
-
-OPERATORS AND VALUES
-
-Operators and values can be entered one per line or as a sequence of tokens separated by space.
-
-Caluclations are performed using Reverse Polish Notation (RPN).
-
-Unary operators will act on the first element in the stack, binary on the first two elements.
-
-TODO: Enter more help information...
-
-List of operators:
-
-%v
-
-`, cmds, ops)
-
 }
 
 func member(t string, ms ...string) bool {
