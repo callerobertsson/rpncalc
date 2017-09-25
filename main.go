@@ -11,14 +11,16 @@ import (
 )
 
 var config = struct {
-	Prec int
+	DisplayPrecision int
+	PrintStack       bool
 }{
-	Prec: 2,
+	DisplayPrecision: 2,
+	PrintStack:       false,
 }
 
 func main() {
 	fmt.Println("Simple RPN Calculator")
-	fmt.Println(`enter "h" for help or "q" to quit`)
+	fmt.Println(`enter ":h" for help or ":q" to quit`)
 
 	r := rpncalc.New()
 
@@ -30,35 +32,13 @@ func main() {
 		var err error
 		var msg string
 
-		// TODO: refactor in func, present in both main and rpncalc
-		in := func(t string, ms ...string) bool {
-			for _, m := range ms {
-				if m == t {
-					return true
-				}
-			}
-			return false
-		}
-
 		input := strings.TrimSpace(scanner.Text())
 
 		switch {
 		case input == "":
 			continue
-		case in(input, "q", "quit"):
-			os.Exit(0)
-		case in(input, "?", "help"):
-			printHelp()
-		case in(input, "st", "stack"):
-			fmt.Printf("Stack:\n")
-			printStack(r)
-			fmt.Println("")
-		case in(input, "regs", "registers"):
-			fmt.Printf("Registers:\n")
-			printRegisters(r)
-		case in(input, "h", "log", "history"):
-			fmt.Printf("History:\n")
-			printLog(r)
+		case strings.HasPrefix(input, ":"):
+			err = doCommand(r, input)
 		default:
 			err = r.Enter(input)
 		}
@@ -76,8 +56,13 @@ func main() {
 }
 
 func printPrompt(r *rpncalc.RpnCalc, msg string) {
-	fmt.Println("==================")
-	printStack(r)
+	if config.PrintStack {
+		fmt.Println("==================")
+		printStack(r)
+	} else {
+		fmt.Printf("%v", formatVal(r.Val()))
+	}
+
 	if msg == "" {
 		fmt.Printf(" > ")
 		return
@@ -111,14 +96,53 @@ func printLog(r *rpncalc.RpnCalc) {
 }
 
 func formatVal(v float64) string {
-	f := fmt.Sprintf("%%.%vf", config.Prec)
+	f := fmt.Sprintf("%%.%vf", config.DisplayPrecision)
 	return fmt.Sprintf(f, v)
 }
 
 func printHelp() {
-	fmt.Println(`
-	RPN Calc Help
+	format := "  %20v: %v\n"
+	cmds := fmt.Sprintf(format, "Command", "Desciption")
+	for _, cmd := range commands {
+		cmds += fmt.Sprintf(format, strings.Join(cmd.names, ", "), cmd.description)
+	}
 
-	TODO: Write some more help info here!
-	`)
+	ops := "TBD"
+
+	fmt.Printf(`
+RPN Calc Help
+
+COMMANDS
+
+Commands are prefixed with a colon, ex ":quit" and must be entered first on a line.
+
+List of commands:
+
+%v
+
+OPERATORS AND VALUES
+
+Operators and values can be entered one per line or as a sequence of tokens separated by space.
+
+Caluclations are performed using Reverse Polish Notation (RPN).
+
+Unary operators will act on the first element in the stack, binary on the first two elements.
+
+TODO: Enter more help information...
+
+List of operators:
+
+%v
+
+`, cmds, ops)
+
+}
+
+func member(t string, ms ...string) bool {
+	for _, m := range ms {
+		if m == t {
+			return true
+		}
+	}
+	return false
 }
