@@ -10,44 +10,64 @@ import (
 	"github.com/callerobertsson/rpncalc/rpncalc"
 )
 
+var config = struct {
+	Prec int
+}{
+	Prec: 2,
+}
+
 func main() {
-	fmt.Println("RPN Calc")
+	fmt.Println("Simple RPN Calculator")
+	fmt.Println(`enter "h" for help or "q" to quit`)
 
 	r := rpncalc.New()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 
-	printPrompt(0.0, "enter q to quit")
+	printPrompt(r, "")
 	for scanner.Scan() {
 		var err error
+		var msg string
+
+		// TODO: refactor in func, present in both main and rpncalc
+		in := func(t string, ms ...string) bool {
+			for _, m := range ms {
+				if m == t {
+					return true
+				}
+			}
+			return false
+		}
+
 		input := strings.TrimSpace(scanner.Text())
 
-		switch input {
-		case "":
+		switch {
+		case input == "":
 			continue
-		case "q", "quit":
+		case in(input, "q", "quit"):
 			os.Exit(0)
-		case "?", "help":
+		case in(input, "?", "help"):
 			printHelp()
-		case "stack":
+		case in(input, "st", "stack"):
+			fmt.Printf("Stack:\n")
 			printStack(r)
-		case "regs", "registers":
+			fmt.Println("")
+		case in(input, "regs", "registers"):
+			fmt.Printf("Registers:\n")
 			printRegisters(r)
-		case "h", "log", "history":
+		case in(input, "h", "log", "history"):
+			fmt.Printf("History:\n")
 			printLog(r)
 		default:
 			err = r.Enter(input)
 		}
 
-		fmt.Printf("Stack: %v\n", r.Stack())
-		msg := ""
-		v := r.Val()
 		if err != nil {
 			msg = err.Error()
 		}
 
-		printPrompt(v, msg)
+		printPrompt(r, msg)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -55,33 +75,44 @@ func main() {
 	}
 }
 
-func printPrompt(v float64, msg string) {
+func printPrompt(r *rpncalc.RpnCalc, msg string) {
+	fmt.Println("==================")
+	printStack(r)
 	if msg == "" {
-		fmt.Printf("rpncalc %v > ", v)
+		fmt.Printf(" > ")
 		return
 	}
-	fmt.Printf("rpncalc %q > ", msg)
+	fmt.Printf(" [%v] > ", msg)
 }
 
 func printStack(r *rpncalc.RpnCalc) {
-	fmt.Printf("Stack:\n")
 	for i := len(r.Stack()) - 1; i >= 0; i-- {
-		fmt.Printf("  %2d: %v\n", i, r.Stack()[i])
+		fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
+		if i != 0 {
+			fmt.Printf("\n")
+		}
 	}
 }
 
 func printRegisters(r *rpncalc.RpnCalc) {
-	fmt.Printf("Registers:\n")
-	for i, r := range r.Regs() {
-		fmt.Printf("  %2d: %v\n", i, r)
+	for i, v := range r.Regs() {
+		fmt.Printf("  %2d: %v\n", i, formatVal(v))
 	}
 }
 
 func printLog(r *rpncalc.RpnCalc) {
-	fmt.Printf("History (%d items)\n", len(r.Log()))
+	if len(r.Log()) < 1 {
+		fmt.Println("  history is empty")
+		return
+	}
 	for i, l := range r.Log() {
 		fmt.Printf("  %4d: %v\n", len(r.Log())-i, l)
 	}
+}
+
+func formatVal(v float64) string {
+	f := fmt.Sprintf("%%.%vf", config.Prec)
+	return fmt.Sprintf(f, v)
 }
 
 func printHelp() {
