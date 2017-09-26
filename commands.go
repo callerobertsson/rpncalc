@@ -22,7 +22,7 @@ func init() {
 	commands = []command{
 		{[]string{"q", "quit"}, cmdQuit, "Exits RpnCalc"},
 		{[]string{"s", "stack"}, cmdStack, "Show or clear stack values"},
-		{[]string{"r", "regs"}, cmdRegs, "Show registers"},
+		{[]string{"r", "regs"}, cmdRegs, "Show or clear registers"},
 		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
 		{[]string{"set"}, cmdSetting, "Show or set configuration settings"},
 		{[]string{"h", "help"}, cmdHelp, "Show RpnCalc help"},
@@ -68,12 +68,21 @@ func cmdStack(r *rpncalc.RpnCalc, args []string) error {
 	return fmt.Errorf("unknown command: %q", strings.Join(args, " "))
 }
 
-func cmdRegs(r *rpncalc.RpnCalc, _ []string) error {
-	fmt.Printf("Registers:\n")
-	for i, v := range r.Regs() {
-		fmt.Printf("  %2d: %v\n", i, formatVal(v))
+func cmdRegs(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) == 1 {
+		fmt.Printf("Registers:\n")
+		for i, v := range r.Regs() {
+			fmt.Printf("  %2d: %v\n", i, formatVal(v))
+		}
+		return nil
 	}
-	return nil
+
+	if len(args) == 2 && args[1] == "clear" {
+		r.ClearRegs()
+		return nil
+	}
+
+	return fmt.Errorf("unknown command: %q", strings.Join(args, " "))
 }
 
 func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
