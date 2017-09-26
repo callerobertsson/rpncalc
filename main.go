@@ -62,7 +62,7 @@ func main() {
 
 func prompt(r *rpncalc.RpnCalc, msg string) (p string) {
 	if config.ShowStack {
-		cmdStack(r, []string{})
+		cmdStack(r, []string{"s"}) // reuse stack command
 	}
 	p = fmt.Sprintf("%v", formatVal(r.Val()))
 

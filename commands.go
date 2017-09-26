@@ -107,7 +107,11 @@ func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
 			fmt.Printf(f, "prec", config.DisplayPrecision)
 		case "showstack":
 			if len(args) > 2 {
-				fmt.Printf("WARNING: cannot alter this setting in current verison\n")
+				t, err := strconv.ParseBool(args[2])
+				if err != nil {
+					return fmt.Errorf("%q is not a boolean value", args[2])
+				}
+				config.ShowStack = t
 			}
 			fmt.Printf(f, "showstack", config.ShowStack)
 		default:
