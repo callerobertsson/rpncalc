@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/callerobertsson/rpncalc/rpncalc"
@@ -11,7 +12,7 @@ import (
 
 type command struct {
 	names       []string
-	handler     func(*rpncalc.RpnCalc, ...string) error
+	handler     func(*rpncalc.RpnCalc, []string) error
 	description string
 }
 
@@ -23,27 +24,30 @@ func init() {
 		{[]string{"s", "stack"}, cmdStack, "Show stack values"},
 		{[]string{"r", "regs"}, cmdRegs, "Show registers"},
 		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
+		{[]string{"set"}, cmdSetting, "Show or set configuration settings"},
 		{[]string{"h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
 }
 
 func doCommand(r *rpncalc.RpnCalc, in string) error {
 	in = strings.TrimSpace(strings.TrimPrefix(in, ":"))
+	args := strings.Split(in, " ")
+	args = filter(args, func(x string) bool { return x != "" })
 	for _, cmd := range commands {
-		if member(in, cmd.names...) {
-			return cmd.handler(r, in)
+		if member(args[0], cmd.names...) {
+			return cmd.handler(r, args)
 		}
 	}
 	return fmt.Errorf("unknown command %q", in)
 }
 
-func cmdQuit(_ *rpncalc.RpnCalc, _ ...string) error {
+func cmdQuit(_ *rpncalc.RpnCalc, _ []string) error {
 	fmt.Println("Bye!")
 	os.Exit(0)
 	return nil // :-)
 }
 
-func cmdStack(r *rpncalc.RpnCalc, _ ...string) error {
+func cmdStack(r *rpncalc.RpnCalc, _ []string) error {
 	fmt.Printf("Stack:\n")
 	for i := len(r.Stack()) - 1; i >= 0; i-- {
 		fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
@@ -55,7 +59,7 @@ func cmdStack(r *rpncalc.RpnCalc, _ ...string) error {
 	return nil
 }
 
-func cmdRegs(r *rpncalc.RpnCalc, _ ...string) error {
+func cmdRegs(r *rpncalc.RpnCalc, _ []string) error {
 	fmt.Printf("Registers:\n")
 	for i, v := range r.Regs() {
 		fmt.Printf("  %2d: %v\n", i, formatVal(v))
@@ -63,7 +67,42 @@ func cmdRegs(r *rpncalc.RpnCalc, _ ...string) error {
 	return nil
 }
 
-func cmdLog(r *rpncalc.RpnCalc, _ ...string) error {
+func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) < 2 {
+		// show all configuration
+		fmt.Printf("%v\n", jsonConfig())
+		return nil
+	}
+
+	if len(args) >= 2 {
+		// show one configuaration
+		f := "  %v: %v\n"
+		switch args[1] {
+		case "prec":
+			if len(args) > 2 {
+				p, err := strconv.Atoi(args[2])
+				if err != nil {
+					return fmt.Errorf("precision value is not a number")
+				}
+				config.DisplayPrecision = p
+			}
+			fmt.Printf(f, "prec", config.DisplayPrecision)
+		case "showstack":
+			if len(args) > 2 {
+				fmt.Printf("WARNING: cannot alter this setting in current verison\n")
+			}
+			fmt.Printf(f, "showstack", config.ShowStack)
+		default:
+			return fmt.Errorf("unknown setting: %q", args[1])
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("partially implemented")
+}
+
+func cmdLog(r *rpncalc.RpnCalc, _ []string) error {
 	fmt.Printf("Log:\n")
 	if len(r.Log()) < 1 {
 		fmt.Println("  log is empty")
@@ -75,7 +114,7 @@ func cmdLog(r *rpncalc.RpnCalc, _ ...string) error {
 	return nil
 }
 
-func cmdHelp(_ *rpncalc.RpnCalc, _ ...string) error {
+func cmdHelp(_ *rpncalc.RpnCalc, _ []string) error {
 	format := "  %20v: %v\n"
 	cmds := fmt.Sprintf(format, "Command", "Desciption")
 	for _, cmd := range commands {

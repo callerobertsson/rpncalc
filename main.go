@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -11,11 +12,11 @@ import (
 )
 
 var config = struct {
-	DisplayPrecision int
-	PrintStack       bool
+	DisplayPrecision int  `json:"prec"`
+	ShowStack        bool `json:"showstack"`
 }{
 	DisplayPrecision: 2,
-	PrintStack:       false,
+	ShowStack:        false,
 }
 
 func main() {
@@ -56,8 +57,8 @@ func main() {
 }
 
 func prompt(r *rpncalc.RpnCalc, msg string) {
-	if config.PrintStack {
-		cmdStack(r)
+	if config.ShowStack {
+		cmdStack(r, []string{})
 	}
 	fmt.Printf("%v", formatVal(r.Val()))
 
@@ -73,6 +74,7 @@ func formatVal(v float64) string {
 	return fmt.Sprintf(f, v)
 }
 
+// TODO: Move member func to util package?
 func member(t string, ms ...string) bool {
 	for _, m := range ms {
 		if m == t {
@@ -80,4 +82,26 @@ func member(t string, ms ...string) bool {
 		}
 	}
 	return false
+}
+
+// TODO: Move filter func to util package?
+func filter(ss []string, p func(s string) bool) []string {
+	rs := []string{}
+
+	for _, s := range ss {
+		if p(s) {
+			rs = append(rs, s)
+		}
+	}
+
+	return rs
+}
+
+func jsonConfig() string {
+	bs, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return "could not display config"
+	}
+
+	return string(bs)
 }
