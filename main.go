@@ -2,13 +2,14 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/callerobertsson/rpncalc/rpncalc"
+
+	"github.com/chzyer/readline"
 )
 
 var config = struct {
@@ -25,15 +26,20 @@ func main() {
 
 	r := rpncalc.New()
 
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Split(bufio.ScanLines)
+	rl, err := readline.New(prompt(r, ""))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to create line reader:", err)
+		os.Exit(1)
+	}
 
-	prompt(r, "")
-	for scanner.Scan() {
-		var err error
-		var msg string
+	for {
+		line, err := rl.Readline()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "reading input failed:", err)
+			os.Exit(1)
+		}
 
-		input := strings.TrimSpace(scanner.Text())
+		input := strings.TrimSpace(line)
 
 		switch {
 		case input == "":
@@ -44,29 +50,29 @@ func main() {
 			err = r.Enter(input)
 		}
 
+		msg := ""
 		if err != nil {
 			msg = err.Error()
 		}
 
-		prompt(r, msg)
+		rl.SetPrompt(prompt(r, msg))
 	}
 
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading input:", err)
-	}
 }
 
-func prompt(r *rpncalc.RpnCalc, msg string) {
+func prompt(r *rpncalc.RpnCalc, msg string) (p string) {
 	if config.ShowStack {
 		cmdStack(r, []string{})
 	}
-	fmt.Printf("%v", formatVal(r.Val()))
+	p = fmt.Sprintf("%v", formatVal(r.Val()))
 
 	if msg == "" {
-		fmt.Printf(" > ")
-		return
+		p += " > "
+		return p
 	}
-	fmt.Printf(" [%v] > ", msg)
+	p += fmt.Sprintf(" [%v] > ", msg)
+
+	return p
 }
 
 func formatVal(v float64) string {
