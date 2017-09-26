@@ -26,7 +26,7 @@ func TestRegParseAndStore(t *testing.T) {
 		r.stack[0] = c.val
 
 		// Execute store command
-		err := r.regParseAndStore(c.cmd)
+		err := dynOpRegStore(r, c.cmd)
 		if err != c.err {
 			t.Errorf("Case %v: Expected error %v, but got %v", c.name, c.err, err)
 		}
@@ -62,7 +62,7 @@ func TestRegParseAndRetrieve(t *testing.T) {
 		r.regs[c.reg] = c.exp
 
 		// Execute store command
-		err := r.regParseAndRetrieve(c.cmd)
+		err := dynOpRegRestore(r, c.cmd)
 		if err != c.err {
 			t.Errorf("Case %v: Expected error %v, but got %v", c.name, c.err, err)
 		}
@@ -98,7 +98,7 @@ func TestRegParseAndClear(t *testing.T) {
 		r.regs[c.reg] = c.val
 
 		// Execute store command
-		err := r.regParseAndClear(c.cmd)
+		err := dynOpRegClear(r, c.cmd)
 		if err != c.err {
 			t.Errorf("Case %v: Expected error %v, but got %v", c.name, c.err, err)
 		}

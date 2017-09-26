@@ -3,7 +3,7 @@ package rpncalc
 
 import "strconv"
 
-func (r *RpnCalc) regParseAndStore(t string) error {
+func dynOpRegStore(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
 		return errInvalidRegister
@@ -12,7 +12,7 @@ func (r *RpnCalc) regParseAndStore(t string) error {
 	return r.regStore(reg)
 }
 
-func (r *RpnCalc) regParseAndRetrieve(t string) error {
+func dynOpRegRestore(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
 		return errInvalidRegister
@@ -21,7 +21,7 @@ func (r *RpnCalc) regParseAndRetrieve(t string) error {
 	return r.regRetrieve(reg)
 }
 
-func (r *RpnCalc) regParseAndClear(t string) error {
+func dynOpRegClear(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
 		return errInvalidRegister

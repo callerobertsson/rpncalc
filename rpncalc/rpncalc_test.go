@@ -112,7 +112,7 @@ func TestEnterVal(t *testing.T) {
 		for i := 0; i < len(c.input)-1; i++ {
 			err = r.Enter(c.input[i])
 			if err != nil {
-				t.Errorf("Case %v: Error in step %d: %v", c.name, i, err)
+				t.Errorf("%q: Error in step %d: %v", c.name, i, err)
 				break
 			}
 		}
@@ -124,14 +124,14 @@ func TestEnterVal(t *testing.T) {
 		// Enter final operation
 		err = r.Enter(c.input[len(c.input)-1])
 		if err != c.err {
-			t.Errorf("Case %v: Expected error %v, but got %q for %v", c.name, c.err, err, c.input[len(c.input)-1])
+			t.Errorf("%q: Expected error %v, but got %q for %v", c.name, c.err, err, c.input[len(c.input)-1])
 			continue
 		}
 
 		// Check stack
 		for i := range c.stack {
 			if c.stack[i] != r.stack[i] {
-				t.Errorf("Case %v: Expected stack %v, but got %v", c.name, c.stack, r.stack)
+				t.Errorf("%q: Expected stack %v, but got %v", c.name, c.stack, r.stack)
 			}
 		}
 	}
@@ -162,20 +162,16 @@ func TestValAndClear(t *testing.T) {
 
 func TestLogContentAndClear(t *testing.T) {
 
-	expLog := []string{"1", "2", "+", ">> 3", "3", "+", ">> 6"}
+	expLog := []string{"1", "2", "+", ">> 3", "3", "+", ">> 6", "0", "inv", "[division by zero]"}
 
 	r := New()
 
-	err := r.Enter("1 2 + 3 +")
-	if err != nil {
-		t.Fatalf("Could not enter expression, got error %v", err)
+	err := r.Enter("1 2 + 3 + 0 inv")
+	if err != errDivisionByZero {
+		t.Fatalf("Expected error %v, got error %v", errDivisionByZero, err)
 	}
 
 	l := r.Log()
-	if len(l) != len(expLog) {
-		t.Fatalf("Expected log length %v, but got %v", len(expLog), len(l))
-	}
-
 	if fmt.Sprintf("%v", l) != fmt.Sprintf("%v", expLog) {
 		t.Fatalf("Expected log %v, but got %v", expLog, l)
 	}

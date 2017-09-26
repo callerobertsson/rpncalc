@@ -26,30 +26,33 @@ func main() {
 
 	r := rpncalc.New()
 
+	// Create input line reader
 	rl, err := readline.New(prompt(r, ""))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "failed to create line reader:", err)
+		fmt.Fprintln(os.Stderr, "Failed to create line reader:", err)
 		os.Exit(1)
 	}
 
 	for {
+		// Read input line
 		line, err := rl.Readline()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "reading input failed:", err)
+			fmt.Fprintln(os.Stderr, "Reading input line failed:", err)
 			os.Exit(1)
 		}
+		line = strings.TrimSpace(line)
 
-		input := strings.TrimSpace(line)
-
+		// Choose what to do
 		switch {
-		case input == "":
+		case line == "":
 			continue
-		case strings.HasPrefix(input, ":"):
-			err = doCommand(r, input)
+		case strings.HasPrefix(line, ":"):
+			err = doCommand(r, line)
 		default:
-			err = r.Enter(input)
+			err = r.Enter(line)
 		}
 
+		// Add error message to prompt, if it exists
 		msg := ""
 		if err != nil {
 			msg = err.Error()
@@ -57,7 +60,6 @@ func main() {
 
 		rl.SetPrompt(prompt(r, msg))
 	}
-
 }
 
 func prompt(r *rpncalc.RpnCalc, msg string) (p string) {

@@ -1,4 +1,4 @@
-// Package rpncalc implements a RPN calculator
+// Package rpncalc implements a RPN calculatorwa
 package rpncalc
 
 import (
@@ -20,6 +20,7 @@ type RpnCalcer interface {
 	ClearReg(i int) error
 	ClearRegs()
 	ClearLog()
+	//Operators() []
 }
 
 const (
@@ -57,6 +58,8 @@ func New() *RpnCalc {
 // Enter takes some input, number, operator, or command, and tries to parse it
 func (r *RpnCalc) Enter(input string) error {
 
+	input = strings.TrimSpace(input)
+
 	// Split input into tokens
 	ts := strings.Split(input, " ")
 	for _, t := range ts {
@@ -68,66 +71,69 @@ func (r *RpnCalc) Enter(input string) error {
 		// Try to parse a float64
 		val, err := strconv.ParseFloat(t, 64)
 		if err == nil {
+			// Token is a number
 			r.log = append(r.log, fmt.Sprintf("%v", val))
 			r.stack = enter(r.stack, val)
 			continue
 		}
-		err = nil
 
-		in := func(t string, ms ...string) bool {
-			for _, m := range ms {
-				if m == t {
-					return true
-				}
-			}
-			return false
-		}
-
-		// Try to find a matching operator
-		switch {
-		case in(t, "!", "neg"):
-			err = r.unaryOp(opNegate)
-		case in(t, "inv"):
-			err = r.unaryOp(opInverse)
-		case in(t, "sq", "square"):
-			err = r.unaryOp(opSquare)
-		case in(t, "+", "add"):
-			err = r.binaryOp(opAddition)
-		case in(t, "-", "sub"):
-			err = r.binaryOp(opSubtraction)
-		case in(t, "*", "mul", "mult"):
-			err = r.binaryOp(opMultiplication)
-		case in(t, "/", "div"):
-			err = r.binaryOp(opDivision)
-		case in(t, "cs", "clearstack"):
-			r.ClearStack()
-		case in(t, "cr", "clearregs"):
-			r.ClearRegs()
-		case in(t, "sw", "swap"):
-			err = r.stackSwap(0, 1)
-		case strings.HasPrefix(t, "rs"):
-			err = r.regParseAndStore(t)
-		case strings.HasPrefix(t, "rr"):
-			err = r.regParseAndRetrieve(t)
-		case strings.HasPrefix(t, "rc"):
-			err = r.regParseAndClear(t)
-		default:
-			r.log = append(r.log, "Unknown operation: "+t)
-			return errUnknownOperation
-		}
-
-		r.log = append(r.log, t)
-		if err != nil {
-			r.log = append(r.log, "Error: "+err.Error())
-		}
-		r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
-
+		// Match static operators
+		found, err := executeStaticOp(r, t)
 		if err != nil {
 			return err
 		}
+		if found {
+			r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
+			continue
+		}
+
+		// Match dynamic operators
+		found, err = executeDynamicOp(r, t)
+		if err != nil {
+			return err
+		}
+		if found {
+			r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
+			continue
+		}
+
+		// Unknown operation
+		r.log = append(r.log, "Unknown operation: "+t)
+		return errUnknownOperation
 	}
 
 	return nil
+}
+
+func executeStaticOp(r *RpnCalc, t string) (found bool, err error) {
+	for _, op := range staticOps {
+		if in(t, op.names...) {
+			r.log = append(r.log, t)
+			err = op.handler(r)
+			if err != nil {
+				r.log = append(r.log, fmt.Sprintf("[%v]", err))
+				return true, err
+			}
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func executeDynamicOp(r *RpnCalc, t string) (found bool, err error) {
+	// Match dynamic operators
+	for _, op := range dynamicOps {
+		if strings.HasPrefix(t, op.prefix) {
+			r.log = append(r.log, t)
+			err = op.handler(r, t)
+			if err != nil {
+				r.log = append(r.log, fmt.Sprintf("[%v]", err))
+				return true, err
+			}
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // Val gets the first value on the stack, the display value
@@ -203,4 +209,14 @@ func rolldown(s []float64) []float64 {
 		s[i] = s[i+1]
 	}
 	return s
+}
+
+// Helper func to find matching operator name
+func in(t string, ms ...string) bool {
+	for _, m := range ms {
+		if m == t {
+			return true
+		}
+	}
+	return false
 }

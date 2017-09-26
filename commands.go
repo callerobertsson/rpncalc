@@ -136,14 +136,22 @@ func cmdLog(r *rpncalc.RpnCalc, _ []string) error {
 	return nil
 }
 
-func cmdHelp(_ *rpncalc.RpnCalc, _ []string) error {
+func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 	format := "  %20v: %v\n"
 	cmds := fmt.Sprintf(format, "Command", "Desciption")
 	for _, cmd := range commands {
 		cmds += fmt.Sprintf(format, strings.Join(cmd.names, ", "), cmd.description)
 	}
 
-	ops := "TBD"
+	sOps := ""
+	for _, op := range rpncalc.StaticOpsInfo() {
+		sOps += fmt.Sprintf(format, strings.Join(op.Names, ", "), op.Description)
+	}
+
+	dOps := ""
+	for _, op := range rpncalc.DynamicOpsInfo() {
+		dOps += fmt.Sprintf(format, strings.Join(op.Names, ", "), op.Description)
+	}
 
 	fmt.Printf(`
 RPN Calc Help
@@ -166,11 +174,15 @@ Unary operators will act on the first element in the stack, binary on the first 
 
 TODO: Enter more help information...
 
-List of operators:
+List of static operators:
 
 %v
 
-`, cmds, ops)
+List of dynamic operators:
+
+%v
+
+`, cmds, sOps, dOps)
 
 	return nil
 }
