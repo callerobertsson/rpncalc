@@ -22,7 +22,7 @@ func init() {
 		{[]string{"q", "quit"}, cmdQuit, "Exits RpnCalc"},
 		{[]string{"s", "stack"}, cmdStack, "Show stack values"},
 		{[]string{"r", "regs"}, cmdRegs, "Show registers"},
-		{[]string{"l", "history"}, cmdHistory, "Show calculation history"},
+		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
 		{[]string{"h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
 }
@@ -63,10 +63,10 @@ func cmdRegs(r *rpncalc.RpnCalc, _ ...string) error {
 	return nil
 }
 
-func cmdHistory(r *rpncalc.RpnCalc, _ ...string) error {
-	fmt.Printf("History:\n")
+func cmdLog(r *rpncalc.RpnCalc, _ ...string) error {
+	fmt.Printf("Log:\n")
 	if len(r.Log()) < 1 {
-		fmt.Println("  history is empty")
+		fmt.Println("  log is empty")
 		return nil
 	}
 	for i, l := range r.Log() {
