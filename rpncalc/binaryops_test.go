@@ -60,6 +60,12 @@ func TestBinaryOpBasicOps(t *testing.T) {
 		{"multiply with negative number", opMultiplication, 1.23, -100.0, -123.0, nil},
 		{"simple division", opDivision, 101.0, 10.0, 10.1, nil},
 		{"divide by zero will fail", opDivision, 101.0, 0.0, 0.0, errDivisionByZero},
+		{"power 2**0", opPower, 2, 0, 1, nil},
+		{"power 2**1", opPower, 2, 1, 2, nil},
+		{"power 2**-1", opPower, 2, -1, 0.5, nil},
+		{"power 4**-2", opPower, 4, -2, 0.0625, nil},
+		{"power 10**100", opPower, 10, 100, math.Pow(10, 100), nil},
+		{"power 3**-4", opPower, 3, -4, math.Pow(3, -4), nil},
 
 		// TODO: Add more cases for unary operators
 	}

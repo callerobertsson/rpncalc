@@ -64,6 +64,12 @@ func opDivision(r *RpnCalc) error {
 	})
 }
 
+func opPower(r *RpnCalc) error {
+	return r.binaryOp(func(x, y float64) (float64, error) {
+		return math.Pow(x, y), nil
+	})
+}
+
 func opSwap(r *RpnCalc) error {
 	return r.stackSwap(0, 1)
 }

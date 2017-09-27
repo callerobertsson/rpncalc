@@ -2,6 +2,7 @@ package rpncalc
 
 import (
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -67,6 +68,8 @@ func TestEnterVal(t *testing.T) {
 			[]string{"1234 100 10 / /"}, []float64{123.4, 0.0, 0.0, 0.0}, nil},
 		{"multiple ops",
 			[]string{"1234 100 * 1000 / 1 -"}, []float64{122.4, 0.0, 0.0, 0.0}, nil},
+		{"power of 1073",
+			[]string{"1073 2 **"}, []float64{math.Pow(1073, 2), 0.0, 0.0, 0.0}, nil},
 		{"swap value",
 			[]string{"1 2 3 4 sw"}, []float64{3, 4, 2, 1}, nil},
 

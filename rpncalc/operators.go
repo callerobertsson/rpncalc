@@ -41,6 +41,7 @@ var staticOps = []struct {
 	{[]string{"/", "div"}, opDivision, "Divides (y/x) first two values on stack"},
 	{[]string{"cs", "clearstack"}, opClearStack, "Clears all values on stack"},
 	{[]string{"cr", "clearregs"}, opClearRegs, "Clears all register values"},
+	{[]string{"**", "pow"}, opPower, "Calculates y to the power of x (y**x)"},
 	{[]string{"sw", "swap"}, opSwap, "Swap first and second value on stack"},
 }
 
