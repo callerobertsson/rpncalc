@@ -8,28 +8,20 @@ import (
 
 func TestOpsInfo(t *testing.T) {
 
-	cases := [][]OpInfo{StaticOpsInfo(), DynamicOpsInfo()}
+	for _, o := range OpsInfo() {
 
-	for i, c := range cases {
-
-		if len(c) < 1 {
-			t.Errorf("Case %d: Empty OpInfo list", i)
+		if len(o.Names) < 1 {
+			t.Errorf("Empty names for operator %v", o)
+			continue
+		}
+		for _, n := range o.Names {
+			if strings.TrimSpace(n) == "" {
+				t.Errorf("Empty name for operator %v", o)
+			}
 		}
 
-		for _, o := range c {
-			if len(o.Names) < 1 {
-				t.Errorf("Case %d: Empty names for operator %v", i, o)
-				continue
-			}
-			for _, n := range o.Names {
-				if strings.TrimSpace(n) == "" {
-					t.Errorf("Case %d: Empty name for operator %v", i, o)
-				}
-			}
-
-			if "" == o.Description {
-				t.Errorf("Case %d: Empty description for operator %v", i, o)
-			}
+		if "" == o.Description {
+			t.Errorf("Empty description for operator %v", o)
 		}
 	}
 

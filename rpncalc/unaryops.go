@@ -3,6 +3,18 @@ package rpncalc
 
 import "math"
 
+// Binary operators
+var unaryOps = []struct {
+	names       []string
+	handler     func(*RpnCalc) error
+	description string
+}{
+	{[]string{"!", "neg"}, opNegate, "Negates (-x) first value on stack"},
+	{[]string{"inv"}, opInverse, "Inverts (1/x) first value on stack"},
+	{[]string{"sq", "square"}, opSquare, "Squares (x^2) first value on stack"},
+	{[]string{"sqrt", "root"}, opSquareRoot, "Calulates the square root"},
+}
+
 func (r *RpnCalc) unaryOp(f func(float64) (float64, error)) error {
 	v, err := f(r.stack[0])
 	if err != nil {

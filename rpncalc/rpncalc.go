@@ -78,7 +78,7 @@ func (r *RpnCalc) Enter(input string) error {
 			continue
 		}
 
-		// Match static operators
+		// Match static operators, unary and binary
 		found, err := executeStaticOp(r, t)
 		if err != nil {
 			return err
@@ -88,7 +88,7 @@ func (r *RpnCalc) Enter(input string) error {
 			continue
 		}
 
-		// Match dynamic operators
+		// Match dynamic operators, register ops
 		found, err = executeDynamicOp(r, t)
 		if err != nil {
 			return err
@@ -107,7 +107,18 @@ func (r *RpnCalc) Enter(input string) error {
 }
 
 func executeStaticOp(r *RpnCalc, t string) (found bool, err error) {
-	for _, op := range staticOps {
+	for _, op := range unaryOps {
+		if in(t, op.names...) {
+			r.log = append(r.log, t)
+			err = op.handler(r)
+			if err != nil {
+				r.log = append(r.log, fmt.Sprintf("[%v]", err))
+				return true, err
+			}
+			return true, nil
+		}
+	}
+	for _, op := range binaryOps {
 		if in(t, op.names...) {
 			r.log = append(r.log, t)
 			err = op.handler(r)
@@ -123,7 +134,7 @@ func executeStaticOp(r *RpnCalc, t string) (found bool, err error) {
 
 func executeDynamicOp(r *RpnCalc, t string) (found bool, err error) {
 	// Match dynamic operators
-	for _, op := range dynamicOps {
+	for _, op := range registerOps {
 		if strings.HasPrefix(t, op.prefix) {
 			r.log = append(r.log, t)
 			err = op.handler(r, t)

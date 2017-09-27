@@ -3,6 +3,17 @@ package rpncalc
 
 import "strconv"
 
+// Dynamic operators is a prefix string with a postfix number
+var registerOps = []struct {
+	prefix      string
+	handler     func(*RpnCalc, string) error
+	description string
+}{
+	{"rs", dynOpRegStore, "Store (rsX) value in register X"},
+	{"rr", dynOpRegRestore, "Restore (rrX) value from register X"},
+	{"rc", dynOpRegClear, "Clear (rcX) value from register X"},
+}
+
 func dynOpRegStore(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
