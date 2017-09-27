@@ -38,9 +38,6 @@ func OpsInfo() []OpInfo {
 }
 
 var operators = []Operator{
-	// Stack
-	{StaticOp, []string{"cs", "clearstack"}, "", opClearStack, "Clears all values on stack"},
-	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Clears all values on stack"},
 	// Unary
 	{StaticOp, []string{"!", "neg"}, "", opNegate, "Negates (-x) first value on stack"},
 	{StaticOp, []string{"inv"}, "", opInverse, "Inverts (1/x) first value on stack"},
@@ -48,23 +45,19 @@ var operators = []Operator{
 	{StaticOp, []string{"sqrt", "root"}, "", opSquareRoot, "Calulates the square root"},
 	// Binary
 	{StaticOp, []string{"!", "neg"}, "", opNegate, "Negates (-x) first value on stack"},
-	{StaticOp, []string{"inv"}, "", opInverse, "Inverts (1/x) first value on stack"},
-	{StaticOp, []string{"sq", "square"}, "", opSquare, "Squares (x^2) first value on stack"},
-	{StaticOp, []string{"sqrt", "root"}, "", opSquareRoot, "Calulates the square root"},
 	{StaticOp, []string{"+", "add"}, "", opAddition, "Adds (x+y) first two values on stack"},
 	{StaticOp, []string{"-", "sub"}, "", opSubtraction, "Subtracts (y-x) first two values on stack"},
 	{StaticOp, []string{"*", "mul"}, "", opMultiplication, "Multiplies (y*x) first two values on stack"},
 	{StaticOp, []string{"/", "div"}, "", opDivision, "Divides (y/x) first two values on stack"},
 	{StaticOp, []string{"**", "pow"}, "", opPower, "Calculates y to the power of x (y**x)"},
+	// Stack
+	{StaticOp, []string{"cs", "clearstack"}, "", opClearStack, "Clears all values on stack"},
+	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Clears all values on stack"},
 	// Register
 	{StaticOp, []string{"cr", "clearregs"}, "", opClearRegs, "Clears all register values"},
 	{DynamicOp, []string{}, "rs", dynOpRegStore, "Store (rsX) value in register X"},
 	{DynamicOp, []string{}, "rr", dynOpRegRestore, "Restore (rrX) value from register X"},
 	{DynamicOp, []string{}, "rc", dynOpRegClear, "Clear (rcX) value from register X"},
-}
 
-// TODO: Move opClearRegs to registerops.go
-func opClearRegs(r *RpnCalc, _ string) error {
-	r.ClearRegs()
-	return nil
+	// TODO: Add more operators
 }

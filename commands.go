@@ -145,7 +145,11 @@ func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 
 	ops := ""
 	for _, op := range rpncalc.OpsInfo() {
-		ops += fmt.Sprintf(format, strings.Join(op.Names, ", "), op.Description)
+		cmds := op.Prefix
+		if cmds == "" {
+			cmds = strings.Join(op.Names, ", ")
+		}
+		ops += fmt.Sprintf(format, cmds, op.Description)
 	}
 
 	fmt.Printf(`

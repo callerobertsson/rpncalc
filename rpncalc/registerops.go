@@ -3,13 +3,23 @@ package rpncalc
 
 import "strconv"
 
+func opClearRegs(r *RpnCalc, _ string) error {
+	r.ClearRegs()
+	return nil
+}
+
 func dynOpRegStore(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
 		return errInvalidRegister
 	}
 
-	return r.regStore(reg)
+	if reg < 0 || reg >= len(r.regs) {
+		return errInvalidRegister
+	}
+	r.regs[reg] = r.stack[0]
+
+	return nil
 }
 
 func dynOpRegRestore(r *RpnCalc, t string) error {
@@ -18,7 +28,12 @@ func dynOpRegRestore(r *RpnCalc, t string) error {
 		return errInvalidRegister
 	}
 
-	return r.regRetrieve(reg)
+	if reg < 0 || reg >= len(r.regs) {
+		return errInvalidRegister
+	}
+
+	enter(r.stack, r.regs[reg])
+	return nil
 }
 
 func dynOpRegClear(r *RpnCalc, t string) error {
@@ -40,21 +55,4 @@ func parseReg(t string) (int, error) {
 	}
 
 	return 0, errInvalidRegister
-}
-
-func (r *RpnCalc) regStore(i int) error {
-	if i < 0 || i >= len(r.regs) {
-		return errInvalidRegister
-	}
-	r.regs[i] = r.stack[0]
-
-	return nil
-}
-
-func (r *RpnCalc) regRetrieve(i int) error {
-	if i < 0 || i >= len(r.regs) {
-		return errInvalidRegister
-	}
-	enter(r.stack, r.regs[i])
-	return nil
 }
