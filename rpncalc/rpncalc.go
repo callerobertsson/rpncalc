@@ -31,6 +31,7 @@ const (
 
 var (
 	errIndexOutOfRange  = errors.New("index out of range")
+	errNaN              = errors.New("not a number")
 	errOverflow         = errors.New("overflow")
 	errDivisionByZero   = errors.New("division by zero")
 	errInvalidRegister  = errors.New("invalid register")

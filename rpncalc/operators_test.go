@@ -84,6 +84,9 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		{"square 3", opSquare, 3.0, 9.0, nil},
 		{"square -3", opSquare, -3.0, 9.0, nil},
 		{"square overflow", opSquare, 1e+155, 1e+155, errOverflow},
+		{"square root of 9", opSquareRoot, 9, 3, nil},
+		{"square root of -9", opSquareRoot, -9, -9, errNaN},
+
 		// TODO: Add more cases for unary operators
 	}
 

@@ -36,6 +36,7 @@ var staticOps = []struct {
 	{[]string{"!", "neg"}, opNegate, "Negates (-x) first value on stack"},
 	{[]string{"inv"}, opInverse, "Inverts (1/x) first value on stack"},
 	{[]string{"sq", "square"}, opSquare, "Squares (x^2) first value on stack"},
+	{[]string{"sqrt", "root"}, opSquareRoot, "Calulates the square root"},
 	{[]string{"+", "add"}, opAddition, "Adds (x+y) first two values on stack"},
 	{[]string{"-", "sub"}, opSubtraction, "Subtracts (y-x) first two values on stack"},
 	{[]string{"*", "mul"}, opMultiplication, "Multiplies (y*x) first two values on stack"},
@@ -98,6 +99,16 @@ func opSquare(r *RpnCalc) error {
 			return 0.0, errOverflow
 		}
 		return x * x, nil
+	})
+}
+
+func opSquareRoot(r *RpnCalc) error {
+	return r.unaryOp(func(x float64) (float64, error) {
+		r := math.Sqrt(x)
+		if math.IsNaN(r) {
+			return 0.0, errNaN
+		}
+		return r, nil
 	})
 }
 
