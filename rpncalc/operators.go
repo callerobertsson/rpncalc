@@ -1,8 +1,6 @@
 // Package rpncalc operators
 package rpncalc
 
-import "math"
-
 // OpInfo contains displayable operation information
 type OpInfo struct {
 	Names       []string
@@ -57,111 +55,6 @@ var dynamicOps = []struct {
 	{"rc", dynOpRegClear, "Clear (rcX) value from register X"},
 }
 
-func (r *RpnCalc) unaryOp(f func(float64) (float64, error)) error {
-	v, err := f(r.stack[0])
-	if err != nil {
-		return err
-	}
-	r.stack[0] = v
-	return nil
-}
-
-func (r *RpnCalc) binaryOp(f func(float64, float64) (float64, error)) error {
-	v, err := f(r.stack[1], r.stack[0])
-	if err != nil {
-		return err
-	}
-
-	r.stack = rolldown(r.stack)
-	r.stack[0] = v
-	return nil
-}
-
-func opNegate(r *RpnCalc) error {
-	return r.unaryOp(func(x float64) (float64, error) {
-		return x * (-1.0), nil
-	})
-}
-
-func opInverse(r *RpnCalc) error {
-	return r.unaryOp(func(x float64) (float64, error) {
-		if x == 0.0 {
-			return 0.0, errDivisionByZero
-		}
-
-		return 1 / x, nil
-	})
-}
-
-func opSquare(r *RpnCalc) error {
-	return r.unaryOp(func(x float64) (float64, error) {
-		if x > math.Sqrt(math.MaxFloat64) {
-			return 0.0, errOverflow
-		}
-		return x * x, nil
-	})
-}
-
-func opSquareRoot(r *RpnCalc) error {
-	return r.unaryOp(func(x float64) (float64, error) {
-		r := math.Sqrt(x)
-		if math.IsNaN(r) {
-			return 0.0, errNaN
-		}
-		return r, nil
-	})
-}
-
-func opAddition(r *RpnCalc) error {
-	return r.binaryOp(func(x, y float64) (float64, error) {
-		// both negative
-		if x < 0 && y < 0 {
-			if math.MaxFloat64+x < -y || math.MaxFloat64+y < -x {
-				return 0.0, errOverflow
-			}
-		}
-		// both positive
-		if x > 0 && y > 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y < x {
-				return 0.0, errOverflow
-			}
-		}
-		return x + y, nil
-	})
-}
-
-func opSubtraction(r *RpnCalc) error {
-	return r.binaryOp(func(x, y float64) (float64, error) {
-		if x < 0 && y > 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y > x {
-				return 0.0, errOverflow
-			}
-		}
-		if x > 0 && y < 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y < x {
-				return 0.0, errOverflow
-			}
-		}
-		return x - y, nil
-	})
-}
-
-func opMultiplication(r *RpnCalc) error {
-	return r.binaryOp(func(x, y float64) (float64, error) {
-		return x * y, nil
-	})
-}
-
-func opDivision(r *RpnCalc) error {
-	return r.binaryOp(func(x, y float64) (float64, error) {
-		if y == 0.0 {
-			return 0.0, errDivisionByZero
-		}
-
-		return x / y, nil
-	})
-}
-
 func opClearStack(r *RpnCalc) error {
 	r.ClearStack()
 	return nil
@@ -170,8 +63,4 @@ func opClearStack(r *RpnCalc) error {
 func opClearRegs(r *RpnCalc) error {
 	r.ClearRegs()
 	return nil
-}
-
-func opSwap(r *RpnCalc) error {
-	return r.stackSwap(0, 1)
 }

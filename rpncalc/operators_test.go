@@ -2,162 +2,40 @@ package rpncalc
 
 import (
 	"math"
+	"strings"
 	"testing"
 )
 
-func TestUnaryOp(t *testing.T) {
+func TestOpsInfo(t *testing.T) {
 
-	nice := func(float64) (float64, error) {
-		return 1.0, nil
-	}
-	evil := func(float64) (float64, error) {
-		return 0.0, errOverflow
-	}
+	cases := [][]OpInfo{StaticOpsInfo(), DynamicOpsInfo()}
 
-	cases := []struct {
-		f   func(float64) (float64, error)
-		val float64
-		err error
-	}{
-		{nice, 1.0, nil},
-		{evil, 0.0, errOverflow},
-	}
+	for i, c := range cases {
 
-	for _, c := range cases {
-		r := New()
-
-		err := r.unaryOp(c.f)
-		if err != c.err {
-			t.Errorf("Expected result %v, but got %v", c.err, err)
-		}
-		if r.Stack()[0] != c.val {
-			t.Errorf("Expected value %v, but got %v", c.val, r.Stack()[0])
-		}
-	}
-}
-
-func TestBinaryOp(t *testing.T) {
-
-	nice := func(float64, float64) (float64, error) {
-		return 1.0, nil
-	}
-	evil := func(float64, float64) (float64, error) {
-		return 0.0, errOverflow
-	}
-
-	cases := []struct {
-		f   func(float64, float64) (float64, error)
-		val float64
-		err error
-	}{
-		{nice, 1.0, nil},
-		{evil, 0.0, errOverflow},
-	}
-
-	for _, c := range cases {
-		r := New()
-
-		err := r.binaryOp(c.f)
-		if err != c.err {
-			t.Errorf("Expected result %v, but got %v", c.err, err)
-		}
-		if r.Stack()[0] != c.val {
-			t.Errorf("Expected value %v, but got %v", c.val, r.Stack()[0])
-		}
-	}
-}
-
-func TestUnaryOpBasicOperations(t *testing.T) {
-
-	cases := []struct {
-		name string
-		f    func(*RpnCalc) error
-		v    float64
-		exp  float64
-		err  error
-	}{
-		{"negate 1", opNegate, 1, -1, nil},
-		{"negate -pi", opNegate, -3.14, 3.14, nil},
-		{"invers of 10", opInverse, 10.0, 0.1, nil},
-		{"inverse of 0 should fail", opInverse, 0.0, 0.0, errDivisionByZero},
-		{"square 0", opSquare, 0.0, 0.0, nil},
-		{"square 3", opSquare, 3.0, 9.0, nil},
-		{"square -3", opSquare, -3.0, 9.0, nil},
-		{"square overflow", opSquare, 1e+155, 1e+155, errOverflow},
-		{"square root of 9", opSquareRoot, 9, 3, nil},
-		{"square root of -9", opSquareRoot, -9, -9, errNaN},
-
-		// TODO: Add more cases for unary operators
-	}
-
-	for _, c := range cases {
-		r := New()
-		r.stack[0] = c.v
-
-		err := c.f(r)
-		if err != c.err {
-			t.Errorf("%q: Expected error %v, but got %v", c.name, c.err, err)
-			continue
+		if len(c) < 1 {
+			t.Errorf("Case %d: Empty OpInfo list", i)
 		}
 
-		got := r.stack[0]
+		for _, o := range c {
+			if len(o.Names) < 1 {
+				t.Errorf("Case %d: Empty names for operator %v", i, o)
+				continue
+			}
+			for _, n := range o.Names {
+				if strings.TrimSpace(n) == "" {
+					t.Errorf("Case %d: Empty name for operator %v", i, o)
+				}
+			}
 
-		if got != c.exp {
-			t.Errorf("%q: Expected result %v, but got %v", c.name, c.exp, got)
+			if "" == o.Description {
+				t.Errorf("Case %d: Empty description for operator %v", i, o)
+			}
 		}
 	}
 
 }
 
-func TestBinaryOpBasicOps(t *testing.T) {
-
-	cases := []struct {
-		name string
-		f    func(*RpnCalc) error
-		x    float64
-		y    float64
-		exp  float64
-		err  error
-	}{
-		{"add 1 and -1", opAddition, 1, -1, 0, nil},
-		{"add pi and 2", opAddition, 3.1415, 2.0, 5.1415, nil},
-		{"add negative number", opAddition, 123456789.12345, -1, 123456788.12345, nil},
-		{"add to large number will fail", opAddition, math.MaxFloat64 - 10, 1000.0, 1000.0, errOverflow},
-		{"pi minus 2", opSubtraction, 3.1415, 2.0, 1.1415, nil},
-		{"pi minus -2", opSubtraction, 3.1415, -2.0, 5.1415, nil},
-		{"-1 minus max float will fail", opSubtraction, -1.0, math.MaxFloat64, math.MaxFloat64, errOverflow},
-		{"-max minus -2", opSubtraction, -math.MaxFloat64, -2.0, 2 - math.MaxFloat64, nil},
-		{"-max minus 2 will fail", opSubtraction, -math.MaxFloat64, 2.0, 2.0, errOverflow},
-		{"big number minus -1", opSubtraction, 123456789.12345, -1, 123456790.12345, nil},
-		{"101 times 10", opMultiplication, 101.0, 10.0, 1010.0, nil},
-		{"multiply with negative number", opMultiplication, 1.23, -100.0, -123.0, nil},
-		{"simple division", opDivision, 101.0, 10.0, 10.1, nil},
-		{"divide by zero will fail", opDivision, 101.0, 0.0, 0.0, errDivisionByZero},
-
-		// TODO: Add more cases for unary operators
-	}
-
-	for _, c := range cases {
-		r := New()
-		r.stack[1] = c.x
-		r.stack[0] = c.y
-
-		err := c.f(r)
-
-		if err != c.err {
-			t.Errorf("%q: Expected error %v, but got %v, val %v", c.name, c.err, err, r.stack[0])
-			continue
-		}
-
-		got := r.stack[0]
-
-		if !almostEqual(got, c.exp) {
-			t.Errorf("%q: Expected result %v, but got %v", c.name, c.exp, got)
-		}
-	}
-
-}
-
+// Helper func for checking that two float64 are almost equal
 func almostEqual(x, y float64) bool {
 	delta := 0.000000000000001
 	return math.Abs(x-y) < delta
