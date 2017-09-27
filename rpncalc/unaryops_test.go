@@ -4,15 +4,15 @@ import "testing"
 
 func TestUnaryOp(t *testing.T) {
 
-	nice := func(float64) (float64, error) {
+	nice := func(float64, string) (float64, error) {
 		return 1.0, nil
 	}
-	evil := func(float64) (float64, error) {
+	evil := func(float64, string) (float64, error) {
 		return 0.0, errOverflow
 	}
 
 	cases := []struct {
-		f   func(float64) (float64, error)
+		f   func(float64, string) (float64, error)
 		val float64
 		err error
 	}{
@@ -37,7 +37,7 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 
 	cases := []struct {
 		name string
-		f    func(*RpnCalc) error
+		f    func(*RpnCalc, string) error
 		v    float64
 		exp  float64
 		err  error
@@ -60,7 +60,7 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		r := New()
 		r.stack[0] = c.v
 
-		err := c.f(r)
+		err := c.f(r, "")
 		if err != c.err {
 			t.Errorf("%q: Expected error %v, but got %v", c.name, c.err, err)
 			continue

@@ -40,7 +40,7 @@ func TestBinaryOpBasicOps(t *testing.T) {
 
 	cases := []struct {
 		name string
-		f    func(*RpnCalc) error
+		f    func(*RpnCalc, string) error
 		x    float64
 		y    float64
 		exp  float64
@@ -75,7 +75,7 @@ func TestBinaryOpBasicOps(t *testing.T) {
 		r.stack[1] = c.x
 		r.stack[0] = c.y
 
-		err := c.f(r)
+		err := c.f(r, "")
 
 		if err != c.err {
 			t.Errorf("%q: Expected error %v, but got %v, val %v", c.name, c.err, err, r.stack[0])

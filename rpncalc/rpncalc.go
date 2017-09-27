@@ -79,17 +79,7 @@ func (r *RpnCalc) Enter(input string) error {
 		}
 
 		// Match static operators, unary and binary
-		found, err := executeStaticOp(r, t)
-		if err != nil {
-			return err
-		}
-		if found {
-			r.log = append(r.log, fmt.Sprintf(">> %v", r.stack[0]))
-			continue
-		}
-
-		// Match dynamic operators, register ops
-		found, err = executeDynamicOp(r, t)
+		found, err := executeOp(r, t)
 		if err != nil {
 			return err
 		}
@@ -106,38 +96,11 @@ func (r *RpnCalc) Enter(input string) error {
 	return nil
 }
 
-func executeStaticOp(r *RpnCalc, t string) (found bool, err error) {
-	for _, op := range unaryOps {
-		if in(t, op.names...) {
+func executeOp(r *RpnCalc, t string) (found bool, err error) {
+	for _, op := range operators {
+		if in(t, op.Names...) || (op.Prefix != "" && strings.HasPrefix(t, op.Prefix)) {
 			r.log = append(r.log, t)
-			err = op.handler(r)
-			if err != nil {
-				r.log = append(r.log, fmt.Sprintf("[%v]", err))
-				return true, err
-			}
-			return true, nil
-		}
-	}
-	for _, op := range binaryOps {
-		if in(t, op.names...) {
-			r.log = append(r.log, t)
-			err = op.handler(r)
-			if err != nil {
-				r.log = append(r.log, fmt.Sprintf("[%v]", err))
-				return true, err
-			}
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-func executeDynamicOp(r *RpnCalc, t string) (found bool, err error) {
-	// Match dynamic operators
-	for _, op := range registerOps {
-		if strings.HasPrefix(t, op.prefix) {
-			r.log = append(r.log, t)
-			err = op.handler(r, t)
+			err = op.Handler(r, t)
 			if err != nil {
 				r.log = append(r.log, fmt.Sprintf("[%v]", err))
 				return true, err

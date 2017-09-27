@@ -127,7 +127,7 @@ func TestEnterVal(t *testing.T) {
 		// Enter final operation
 		err = r.Enter(c.input[len(c.input)-1])
 		if err != c.err {
-			t.Errorf("%q: Expected error %v, but got %q for %v", c.name, c.err, err, c.input[len(c.input)-1])
+			t.Errorf("%q: Expected error %v, but got %v for %v", c.name, c.err, err, c.input[len(c.input)-1])
 			continue
 		}
 

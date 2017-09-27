@@ -10,7 +10,11 @@ func TestOpsInfo(t *testing.T) {
 
 	for _, o := range OpsInfo() {
 
-		if len(o.Names) < 1 {
+		if o.Type == StaticOp && len(o.Names) < 1 {
+			t.Errorf("Empty names for operator %v", o)
+			continue
+		}
+		if o.Type == DynamicOp && o.Prefix == "" {
 			t.Errorf("Empty names for operator %v", o)
 			continue
 		}
