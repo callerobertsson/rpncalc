@@ -49,12 +49,12 @@ func TestBinaryOpBasicOps(t *testing.T) {
 		{"add 1 and -1", opAddition, 1, -1, 0, nil},
 		{"add pi and 2", opAddition, 3.1415, 2.0, 5.1415, nil},
 		{"add negative number", opAddition, 123456789.12345, -1, 123456788.12345, nil},
-		{"add to large number will fail", opAddition, math.MaxFloat64 - 10, 1000.0, 1000.0, errOverflow},
+		{"add two large number will fail", opAddition, math.MaxFloat64, math.MaxFloat64 / 10, math.MaxFloat64 / 10, errOverflow},
 		{"pi minus 2", opSubtraction, 3.1415, 2.0, 1.1415, nil},
 		{"pi minus -2", opSubtraction, 3.1415, -2.0, 5.1415, nil},
-		{"-1 minus max float will fail", opSubtraction, -1.0, math.MaxFloat64, math.MaxFloat64, errOverflow},
-		{"-max minus -2", opSubtraction, -math.MaxFloat64, -2.0, 2 - math.MaxFloat64, nil},
-		{"-max minus 2 will fail", opSubtraction, -math.MaxFloat64, 2.0, 2.0, errOverflow},
+		{"negative big number minus max float will fail", opSubtraction, -math.MaxFloat64 / 2, math.MaxFloat64, math.MaxFloat64, errOverflow},
+		{"-max minus big negative number", opSubtraction, -math.MaxFloat64, -math.MaxFloat64 / 2, -math.MaxFloat64 / 2, nil},
+		{"-max minus big number will fail", opSubtraction, -math.MaxFloat64, math.MaxFloat64 / 2, math.MaxFloat64 / 2, errOverflow},
 		{"big number minus -1", opSubtraction, 123456789.12345, -1, 123456790.12345, nil},
 		{"101 times 10", opMultiplication, 101.0, 10.0, 1010.0, nil},
 		{"multiply with negative number", opMultiplication, 1.23, -100.0, -123.0, nil},
@@ -78,7 +78,7 @@ func TestBinaryOpBasicOps(t *testing.T) {
 		err := c.f(r, "")
 
 		if err != c.err {
-			t.Errorf("%q: Expected error %v, but got %v, val %v", c.name, c.err, err, r.stack[0])
+			t.Errorf("%q: Expected error %v for op(%v,%v), but got %v, val %v", c.name, c.err, c.x, c.y, err, r.stack[0])
 			continue
 		}
 

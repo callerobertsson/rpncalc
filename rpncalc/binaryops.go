@@ -16,41 +16,31 @@ func (r *RpnCalc) binaryOp(f func(float64, float64) (float64, error)) error {
 
 func opAddition(r *RpnCalc, _ string) error {
 	return r.binaryOp(func(x, y float64) (float64, error) {
-		// both negative
-		if x < 0 && y < 0 {
-			if math.MaxFloat64+x < -y || math.MaxFloat64+y < -x {
-				return 0.0, errOverflow
-			}
+		z := x + y
+		if math.IsInf(z, 1) || math.IsInf(z, -1) {
+			return 0.0, errOverflow
 		}
-		// both positive
-		if x > 0 && y > 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y < x {
-				return 0.0, errOverflow
-			}
-		}
-		return x + y, nil
+		return z, nil
 	})
 }
 
 func opSubtraction(r *RpnCalc, _ string) error {
 	return r.binaryOp(func(x, y float64) (float64, error) {
-		if x < 0 && y > 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y > x {
-				return 0.0, errOverflow
-			}
+		z := x - y
+		if math.IsInf(z, 1) || math.IsInf(z, -1) {
+			return 0.0, errOverflow
 		}
-		if x > 0 && y < 0 {
-			if math.MaxFloat64-x < y || math.MaxFloat64-y < x {
-				return 0.0, errOverflow
-			}
-		}
-		return x - y, nil
+		return z, nil
 	})
 }
 
 func opMultiplication(r *RpnCalc, _ string) error {
 	return r.binaryOp(func(x, y float64) (float64, error) {
-		return x * y, nil
+		z := x * y
+		if math.IsInf(z, 1) || math.IsInf(z, -1) {
+			return 0.0, errOverflow
+		}
+		return z, nil
 	})
 }
 
