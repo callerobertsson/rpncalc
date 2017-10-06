@@ -48,6 +48,8 @@ func main() {
 			continue
 		case strings.HasPrefix(line, ":"):
 			err = doCommand(r, line)
+		case strings.HasPrefix(line, "!"):
+			err = doShell(line)
 		default:
 			err = r.Enter(line)
 		}
