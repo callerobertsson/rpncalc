@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/callerobertsson/rpncalc/rpncalc"
+	"../rpncalc"
 
 	"github.com/chzyer/readline"
 )
@@ -80,29 +80,6 @@ func prompt(r *rpncalc.RpnCalc, msg string) (p string) {
 func formatVal(v float64) string {
 	f := fmt.Sprintf("%%.%vf", config.DisplayPrecision)
 	return fmt.Sprintf(f, v)
-}
-
-// TODO: Move member func to util package?
-func member(t string, ms ...string) bool {
-	for _, m := range ms {
-		if m == t {
-			return true
-		}
-	}
-	return false
-}
-
-// TODO: Move filter func to util package?
-func filter(ss []string, p func(s string) bool) []string {
-	rs := []string{}
-
-	for _, s := range ss {
-		if p(s) {
-			rs = append(rs, s)
-		}
-	}
-
-	return rs
 }
 
 func jsonConfig() string {

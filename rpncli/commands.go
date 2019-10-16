@@ -3,11 +3,12 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/callerobertsson/rpncalc/rpncalc"
+	"../rpncalc"
 )
 
 type command struct {
@@ -24,6 +25,7 @@ func init() {
 		{[]string{"s", "stack"}, cmdStack, "Show or clear stack values"},
 		{[]string{"r", "regs"}, cmdRegs, "Show or clear registers"},
 		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
+		{[]string{"w", "write"}, cmdWrite, "Write calculation history to file"},
 		{[]string{"set"}, cmdSetting, "Show or set configuration settings"},
 		{[]string{"h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
@@ -31,6 +33,9 @@ func init() {
 
 func doCommand(r *rpncalc.RpnCalc, in string) error {
 	in = strings.TrimSpace(strings.TrimPrefix(in, ":"))
+	if in == "" {
+		return nil
+	}
 	args := strings.Split(in, " ")
 	args = filter(args, func(x string) bool { return x != "" })
 	for _, cmd := range commands {
@@ -134,6 +139,19 @@ func cmdLog(r *rpncalc.RpnCalc, _ []string) error {
 		fmt.Printf("  %4d: %v\n", len(r.Log())-i, l)
 	}
 	return nil
+}
+
+func cmdWrite(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("need file path as argument")
+	}
+
+	if len(r.Log()) < 1 {
+		fmt.Println("  log is empty")
+		return nil
+	}
+
+	return ioutil.WriteFile(args[1], []byte(strings.Join(r.Log(), "\n")), 0644)
 }
 
 func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
