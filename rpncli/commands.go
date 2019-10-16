@@ -68,6 +68,7 @@ func cmdStack(r *rpncalc.RpnCalc, args []string) error {
 		}
 	}
 
+	fmt.Println("")
 	return nil
 }
 
