@@ -22,7 +22,7 @@ var config = struct {
 
 func main() {
 	fmt.Println("Simple RPN Calculator")
-	fmt.Println(`enter ":h" for help or ":q" to quit`)
+	fmt.Println(`enter "help" for help or "quit" to quit`)
 
 	r := rpncalc.New()
 
@@ -41,13 +41,15 @@ func main() {
 			os.Exit(1)
 		}
 		line = strings.TrimSpace(line)
+		args := strings.Split(line, " ")
+		args = filter(args, func(x string) bool { return x != "" })
 
 		// Choose what to do
 		switch {
-		case line == "":
+		case len(args) < 1:
 			continue
-		case strings.HasPrefix(line, ":"):
-			err = doCommand(r, line)
+		case isCommand(args[0]):
+			err = doCommand(r, args)
 		default:
 			err = r.Enter(line)
 		}

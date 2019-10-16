@@ -30,12 +30,12 @@ const (
 )
 
 var (
-	errIndexOutOfRange  = errors.New("index out of range")
-	errNaN              = errors.New("not a number")
-	errOverflow         = errors.New("overflow")
-	errDivisionByZero   = errors.New("division by zero")
-	errInvalidRegister  = errors.New("invalid register")
-	errUnknownOperation = errors.New("unknown operation")
+	errIndexOutOfRange = errors.New("index out of range")
+	errNaN             = errors.New("not a number")
+	errOverflow        = errors.New("overflow")
+	errDivisionByZero  = errors.New("division by zero")
+	errInvalidRegister = errors.New("invalid register")
+	errUnknownInput    = errors.New("unknown input")
 )
 
 // RpnCalc implements a RPN calculator adhering to the RpnCalcer interface
@@ -88,9 +88,9 @@ func (r *RpnCalc) Enter(input string) error {
 			continue
 		}
 
-		// Unknown operation
-		r.log = append(r.log, "Unknown operation: "+t)
-		return errUnknownOperation
+		// Unknown input
+		r.log = append(r.log, "Unknown input: "+t)
+		return errUnknownInput
 	}
 
 	return nil

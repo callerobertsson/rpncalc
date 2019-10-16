@@ -22,28 +22,35 @@ var commands []command
 func init() {
 	commands = []command{
 		{[]string{"q", "quit"}, cmdQuit, "Exits RpnCalc"},
-		{[]string{"s", "stack"}, cmdStack, "Show or clear stack values"},
-		{[]string{"r", "regs"}, cmdRegs, "Show or clear registers"},
+		{[]string{"s", "stack"}, cmdStack, "Show stack values"},
+		{[]string{"r", "regs"}, cmdRegs, "Show registers"},
 		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
 		{[]string{"w", "write"}, cmdWrite, "Write calculation history to file"},
 		{[]string{"set"}, cmdSetting, "Show or set configuration settings"},
-		{[]string{"h", "help"}, cmdHelp, "Show RpnCalc help"},
+		{[]string{"?", "h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
 }
 
-func doCommand(r *rpncalc.RpnCalc, in string) error {
-	in = strings.TrimSpace(strings.TrimPrefix(in, ":"))
-	if in == "" {
+func isCommand(s string) bool {
+	for _, c := range commands {
+		if member(s, c.names...) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func doCommand(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) < 1 {
 		return nil
 	}
-	args := strings.Split(in, " ")
-	args = filter(args, func(x string) bool { return x != "" })
 	for _, cmd := range commands {
 		if member(args[0], cmd.names...) {
 			return cmd.handler(r, args)
 		}
 	}
-	return fmt.Errorf("unknown command %q", in)
+	return fmt.Errorf("unknown command %q", args[0])
 }
 
 func cmdQuit(_ *rpncalc.RpnCalc, _ []string) error {
@@ -53,41 +60,24 @@ func cmdQuit(_ *rpncalc.RpnCalc, _ []string) error {
 }
 
 func cmdStack(r *rpncalc.RpnCalc, args []string) error {
-	if len(args) == 1 {
-		fmt.Printf("Stack:\n")
-		for i := len(r.Stack()) - 1; i >= 0; i-- {
-			fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
-			if i != 0 {
-				fmt.Printf("\n")
-			}
+	fmt.Printf("Stack:\n")
+	for i := len(r.Stack()) - 1; i >= 0; i-- {
+		fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
+		if i != 0 {
+			fmt.Printf("\n")
 		}
-		fmt.Println("")
-		return nil
 	}
 
-	if len(args) == 2 && args[1] == "clear" {
-		r.ClearStack()
-		return nil
-	}
-
-	return fmt.Errorf("unknown command: %q", strings.Join(args, " "))
+	return nil
 }
 
-func cmdRegs(r *rpncalc.RpnCalc, args []string) error {
-	if len(args) == 1 {
-		fmt.Printf("Registers:\n")
-		for i, v := range r.Regs() {
-			fmt.Printf("  %2d: %v\n", i, formatVal(v))
-		}
-		return nil
+func cmdRegs(r *rpncalc.RpnCalc, _ []string) error {
+	fmt.Printf("Registers:\n")
+	for i, v := range r.Regs() {
+		fmt.Printf("  %2d: %v\n", i, formatVal(v))
 	}
 
-	if len(args) == 2 && args[1] == "clear" {
-		r.ClearRegs()
-		return nil
-	}
-
-	return fmt.Errorf("unknown command: %q", strings.Join(args, " "))
+	return nil
 }
 
 func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
@@ -174,8 +164,6 @@ func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 RPN Calc Help
 
 COMMANDS
-
-Commands are prefixed with a colon, ex ":quit" and must be entered first on a line.
 
 List of commands:
 

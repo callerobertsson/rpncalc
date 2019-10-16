@@ -1,4 +1,4 @@
-// Package rpncalc operators
+// Package rpncalc operators. Operators modifies the stack or the registers.
 package rpncalc
 
 // OperatorType defines an operator to be static (exact match) or dynamic (postfixed with a value)
@@ -39,12 +39,11 @@ func OpsInfo() []OpInfo {
 
 var operators = []Operator{
 	// Unary
-	{StaticOp, []string{"!", "neg"}, "", opNegate, "Negates (-x) first value on stack"},
+	{StaticOp, []string{"neg"}, "", opNegate, "Negates (-x) first value on stack"},
 	{StaticOp, []string{"inv"}, "", opInverse, "Inverts (1/x) first value on stack"},
 	{StaticOp, []string{"sq", "square"}, "", opSquare, "Squares (x^2) first value on stack"},
 	{StaticOp, []string{"sqrt", "root"}, "", opSquareRoot, "Calulates the square root"},
 	// Binary
-	{StaticOp, []string{"!", "neg"}, "", opNegate, "Negates (-x) first value on stack"},
 	{StaticOp, []string{"+", "add"}, "", opAddition, "Adds (x+y) first two values on stack"},
 	{StaticOp, []string{"-", "sub"}, "", opSubtraction, "Subtracts (y-x) first two values on stack"},
 	{StaticOp, []string{"*", "mul"}, "", opMultiplication, "Multiplies (y*x) first two values on stack"},
@@ -52,7 +51,7 @@ var operators = []Operator{
 	{StaticOp, []string{"**", "pow"}, "", opPower, "Calculates y to the power of x (y**x)"},
 	// Stack
 	{StaticOp, []string{"cs", "clearstack"}, "", opClearStack, "Clears all values on stack"},
-	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Clears all values on stack"},
+	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Swap pos 0 and pos 1 on the stack"},
 	// Register
 	{StaticOp, []string{"cr", "clearregs"}, "", opClearRegs, "Clears all register values"},
 	{DynamicOp, []string{}, "rs", dynOpRegStore, "Store (rsX) value in register X"},
