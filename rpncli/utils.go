@@ -1,3 +1,4 @@
+// Package main utility funcs
 package main
 
 func member(t string, ms ...string) bool {

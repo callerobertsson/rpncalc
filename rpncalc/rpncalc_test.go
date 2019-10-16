@@ -48,7 +48,7 @@ func TestEnterVal(t *testing.T) {
 	}{
 		// Unary stuff
 		{"negate value",
-			[]string{"1 2 3 4 !"}, []float64{-4, 3, 2, 1}, nil},
+			[]string{"1 2 3 4 neg"}, []float64{-4, 3, 2, 1}, nil},
 		{"inverse value",
 			[]string{"1 2 3 4 inv"}, []float64{0.25, 3, 2, 1}, nil},
 		{"sqare a number",
@@ -99,9 +99,9 @@ func TestEnterVal(t *testing.T) {
 
 		// Unknown operations
 		{"unknown op",
-			[]string{"123", "foo"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownOperation},
+			[]string{"123", "foo"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownInput},
 		{"fail in middle",
-			[]string{"123 foo 321"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownOperation},
+			[]string{"123 foo 321"}, []float64{123.0, 0.0, 0.0, 0.0}, errUnknownInput},
 
 		// TODO: Add testcases when new functionality comes along
 	}
