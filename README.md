@@ -2,6 +2,7 @@
 
 ## Ideas
 
+* Change `log` command to `history`
 * Support `!` to execute shell commands
 * Add command `:tag <string>` to add a tag in the log.
 * Add more advanced functions
