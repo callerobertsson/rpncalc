@@ -24,7 +24,7 @@ func init() {
 		{[]string{"q", "quit"}, cmdQuit, "Exits RpnCalc"},
 		{[]string{"s", "stack"}, cmdStack, "Stack. Use \"stack clear\" to empty stack"},
 		{[]string{"r", "regs"}, cmdRegs, "Registers. User \"regs clear\" to empty registers"},
-		{[]string{"hi", "history"}, cmdLog, "History. use \"history clear\" or \"history write <filepath>\" to save"},
+		{[]string{"hi", "history"}, cmdHistory, "History. use \"history clear\" or \"history write <filepath>\" to save"},
 		{[]string{"set"}, cmdSetting, "Show or set configuration. use \"set <setting> <value>\" to change"},
 		{[]string{"?", "h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
@@ -135,7 +135,7 @@ func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
 	return fmt.Errorf("partially implemented")
 }
 
-func cmdLog(r *rpncalc.RpnCalc, args []string) error {
+func cmdHistory(r *rpncalc.RpnCalc, args []string) error {
 	// handle clear log
 	if len(args) > 1 && args[1] == "clear" {
 		r.ClearLog()
