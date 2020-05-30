@@ -77,13 +77,7 @@ func TestEnterVal(t *testing.T) {
 		{"ignore spaces",
 			[]string{"   1  2  3  4 "}, []float64{4, 3, 2, 1}, nil},
 
-		// Stack operations
-		{"clear stack",
-			[]string{"1 2 3 4 cs"}, []float64{0, 0, 0, 0}, nil},
-
 		// Regs stuff
-		{"clear regs don't change stack",
-			[]string{"1 2 3 4 cr"}, []float64{4, 3, 2, 1}, nil},
 		{"regs store don't change stack",
 			[]string{"1 2 3 4 rs5"}, []float64{4, 3, 2, 1}, nil},
 		{"regs clear don't change stack",

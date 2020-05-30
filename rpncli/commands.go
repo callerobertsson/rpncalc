@@ -22,11 +22,10 @@ var commands []command
 func init() {
 	commands = []command{
 		{[]string{"q", "quit"}, cmdQuit, "Exits RpnCalc"},
-		{[]string{"s", "stack"}, cmdStack, "Show stack values"},
-		{[]string{"r", "regs"}, cmdRegs, "Show registers"},
-		{[]string{"l", "log"}, cmdLog, "Show calculation history"},
-		{[]string{"w", "write"}, cmdWrite, "Write calculation history to file"},
-		{[]string{"set"}, cmdSetting, "Show or set configuration settings"},
+		{[]string{"s", "stack"}, cmdStack, "Stack. Use \"stack clear\" to empty stack"},
+		{[]string{"r", "regs"}, cmdRegs, "Registers. User \"regs clear\" to empty registers"},
+		{[]string{"hi", "history"}, cmdLog, "History. use \"history clear\" or \"history write <filepath>\" to save"},
+		{[]string{"set"}, cmdSetting, "Show or set configuration. use \"set <setting> <value>\" to change"},
 		{[]string{"?", "h", "help"}, cmdHelp, "Show RpnCalc help"},
 	}
 }
@@ -60,6 +59,14 @@ func cmdQuit(_ *rpncalc.RpnCalc, _ []string) error {
 }
 
 func cmdStack(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) > 1 {
+		if args[1] != "clear" {
+			return fmt.Errorf("%q no such option", args[1])
+		}
+		r.ClearStack()
+		return nil
+	}
+
 	fmt.Printf("Stack:\n")
 	for i := len(r.Stack()) - 1; i >= 0; i-- {
 		fmt.Printf("%3d: %10v", i, formatVal(r.Stack()[i]))
@@ -72,7 +79,15 @@ func cmdStack(r *rpncalc.RpnCalc, args []string) error {
 	return nil
 }
 
-func cmdRegs(r *rpncalc.RpnCalc, _ []string) error {
+func cmdRegs(r *rpncalc.RpnCalc, args []string) error {
+	if len(args) > 1 {
+		if args[1] != "clear" {
+			return fmt.Errorf("%q no such option", args[1])
+		}
+		r.ClearRegs()
+		return nil
+	}
+
 	fmt.Printf("Registers:\n")
 	for i, v := range r.Regs() {
 		fmt.Printf("  %2d: %v\n", i, formatVal(v))
@@ -154,22 +169,9 @@ func cmdLog(r *rpncalc.RpnCalc, args []string) error {
 	return nil
 }
 
-func cmdWrite(r *rpncalc.RpnCalc, args []string) error {
-	if len(args) < 1 {
-		return fmt.Errorf("need file path as argument")
-	}
-
-	if len(r.Log()) < 1 {
-		fmt.Println("  log is empty")
-		return nil
-	}
-
-	return ioutil.WriteFile(args[1], []byte(strings.Join(r.Log(), "\n")), 0644)
-}
-
 func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 	format := "  %20v: %v\n"
-	cmds := fmt.Sprintf(format, "Command", "Desciption")
+	cmds := fmt.Sprintf(format, "Command", "Description")
 	for _, cmd := range commands {
 		cmds += fmt.Sprintf(format, strings.Join(cmd.names, ", "), cmd.description)
 	}

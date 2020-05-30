@@ -50,10 +50,8 @@ var operators = []Operator{
 	{StaticOp, []string{"/", "div"}, "", opDivision, "Divides (y/x) first two values on stack"},
 	{StaticOp, []string{"**", "pow"}, "", opPower, "Calculates y to the power of x (y**x)"},
 	// Stack
-	{StaticOp, []string{"cs", "clearstack"}, "", opClearStack, "Clears all values on stack"},
 	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Swap pos 0 and pos 1 on the stack"},
 	// Register
-	{StaticOp, []string{"cr", "clearregs"}, "", opClearRegs, "Clears all register values"},
 	{DynamicOp, []string{}, "rs", dynOpRegStore, "Store (rsX) value in register X"},
 	{DynamicOp, []string{}, "rr", dynOpRegRestore, "Restore (rrX) value from register X"},
 	{DynamicOp, []string{}, "rc", dynOpRegClear, "Clear (rcX) value from register X"},

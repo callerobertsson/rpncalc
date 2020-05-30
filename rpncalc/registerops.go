@@ -3,11 +3,6 @@ package rpncalc
 
 import "strconv"
 
-func opClearRegs(r *RpnCalc, _ string) error {
-	r.ClearRegs()
-	return nil
-}
-
 func dynOpRegStore(r *RpnCalc, t string) error {
 	reg, err := parseReg(t)
 	if err != nil {
