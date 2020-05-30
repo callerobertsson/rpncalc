@@ -120,12 +120,34 @@ func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
 	return fmt.Errorf("partially implemented")
 }
 
-func cmdLog(r *rpncalc.RpnCalc, _ []string) error {
-	fmt.Printf("Log:\n")
+func cmdLog(r *rpncalc.RpnCalc, args []string) error {
+	// handle clear log
+	if len(args) > 1 && args[1] == "clear" {
+		r.ClearLog()
+		fmt.Println("  log cleared")
+		return nil
+	}
+
+	// handle write command
+	if len(args) > 1 && args[1] == "write" {
+		if len(args) < 3 {
+			return fmt.Errorf("write needs a file path as argument")
+		}
+		err := ioutil.WriteFile(args[2], []byte(strings.Join(r.Log(), "\n")+"\n"), 0644)
+		if err != nil {
+			return fmt.Errorf("could not write log to %q\n", args[2])
+		}
+		return nil
+	}
+
+	// if empty log
 	if len(r.Log()) < 1 {
 		fmt.Println("  log is empty")
 		return nil
 	}
+
+	// print log
+	fmt.Printf("Log:\n")
 	for i, l := range r.Log() {
 		fmt.Printf("  %4d: %v\n", len(r.Log())-i, l)
 	}
