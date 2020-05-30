@@ -61,6 +61,12 @@ func (r *RpnCalc) Enter(input string) error {
 
 	input = strings.TrimSpace(input)
 
+	// Check if comment
+	if strings.HasPrefix(input, "#") {
+		r.log = append(r.log, input)
+		return nil
+	}
+
 	// Split input into tokens
 	ts := strings.Split(input, " ")
 	for _, t := range ts {
