@@ -2,7 +2,7 @@
 
 ## Ideas
 
-* Change `log` command to `history`
+* Change `log` command to `history` with shortcut `hi`
 * Support `!` to execute shell commands
 * Add command `:tag <string>` to add a tag in the log.
 * Add more advanced functions
@@ -13,3 +13,4 @@
 
 * Add command `:write <filepath>` to save log.
 * Remove `:` before commands.
+* Add support for comments
