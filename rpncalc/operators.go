@@ -50,6 +50,7 @@ var operators = []Operator{
 	{StaticOp, []string{"*", "mul"}, "", opMultiplication, "Multiplies (y*x) first two values on stack"},
 	{StaticOp, []string{"/", "div"}, "", opDivision, "Divides (y/x) first two values on stack"},
 	{StaticOp, []string{"**", "pow"}, "", opPower, "Calculates y to the power of x (y**x)"},
+	{StaticOp, []string{"%", "mod"}, "", opModulus, "Calculates x modulus y"},
 	// Stack
 	{StaticOp, []string{"sw", "swap"}, "", opSwap, "Swap pos 0 and pos 1 on the stack"},
 	// Register

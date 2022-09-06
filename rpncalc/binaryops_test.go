@@ -66,6 +66,10 @@ func TestBinaryOpBasicOps(t *testing.T) {
 		{"power 4**-2", opPower, 4, -2, 0.0625, nil},
 		{"power 10**100", opPower, 10, 100, math.Pow(10, 100), nil},
 		{"power 3**-4", opPower, 3, -4, math.Pow(3, -4), nil},
+		{"1 modulus 2", opModulus, 1, 2, 1, nil},
+		{"123 modulus 7", opModulus, 123, 7, 4, nil},
+		{"10 modulus 0", opModulus, 10, 0, 4, errValueNotAllowed},
+		{"10 modulus -5", opModulus, 10, -1, 4, errValueNotAllowed},
 
 		// TODO: Add more cases for unary operators
 	}
@@ -77,6 +81,10 @@ func TestBinaryOpBasicOps(t *testing.T) {
 
 		err := c.f(r, "")
 
+		if err != nil && err == c.err {
+			continue // Expected error
+		}
+		
 		if err != c.err {
 			t.Errorf("%q: Expected error %v for op(%v,%v), but got %v, val %v", c.name, c.err, c.x, c.y, err, r.stack[0])
 			continue

@@ -68,9 +68,11 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		r.stack[0] = c.v
 
 		err := c.f(r, "")
+
 		if err != nil && err == c.err {
 			continue // Expected error
 		}
+
 		if err != c.err {
 			t.Errorf("%q: Expected error %v, but got %v", c.name, c.err, err)
 			continue

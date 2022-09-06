@@ -36,6 +36,7 @@ var (
 	errDivisionByZero  = errors.New("division by zero")
 	errInvalidRegister = errors.New("invalid register")
 	errUnknownInput    = errors.New("unknown input")
+	errValueNotAllowed = errors.New("value not allowed")
 )
 
 // RpnCalc implements a RPN calculator adhering to the RpnCalcer interface

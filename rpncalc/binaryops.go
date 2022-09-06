@@ -59,3 +59,15 @@ func opPower(r *RpnCalc, _ string) error {
 		return math.Pow(x, y), nil
 	})
 }
+
+func opModulus(r *RpnCalc, _ string) error {
+	return r.binaryOp(func(x, y float64) (float64, error) {
+		if y <= 0.0 {
+			return 0.0, errValueNotAllowed
+		}
+
+		m := int64(x) % int64(y)
+
+		return float64(m), nil
+	})
+}
