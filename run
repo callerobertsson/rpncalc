@@ -1,4 +1,0 @@
-#!env bash
-
-go run rpncli/*.go
-

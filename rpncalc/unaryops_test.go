@@ -52,6 +52,13 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		{"square overflow", opSquare, 1e+155, 1e+155, errOverflow},
 		{"square root of 9", opSquareRoot, 9, 3, nil},
 		{"square root of -9", opSquareRoot, -9, -9, errNaN},
+		{"dec 1 as bin", opDecToBin, 1, 1, nil},
+		{"dec 2 as bin", opDecToBin, 2, 10, nil},
+		{"dec 3 as bin", opDecToBin, 3, 11, nil},
+		{"dec 255 as bin", opDecToBin, 255, 11111111, nil},
+		{"dec 256 as bin", opDecToBin, 256, 100000000, nil},
+		{"dec 678901234 as bin", opDecToBin, 67890, 10000100100110010, nil},
+		{"dec to bin overflow", opDecToBin, 6789012345, 0, errOverflow},
 
 		// TODO: Add more cases for unary operators
 	}
@@ -61,6 +68,9 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		r.stack[0] = c.v
 
 		err := c.f(r, "")
+		if err != nil && err == c.err {
+			continue // Expected error
+		}
 		if err != c.err {
 			t.Errorf("%q: Expected error %v, but got %v", c.name, c.err, err)
 			continue

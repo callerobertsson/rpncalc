@@ -7,8 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"../rpncalc"
-
+	"github.com/callerobertsson/rpn/rpncalc"
 	"github.com/chzyer/readline"
 )
 

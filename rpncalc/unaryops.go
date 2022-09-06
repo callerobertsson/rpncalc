@@ -1,7 +1,10 @@
 // Package rpncalc operators
 package rpncalc
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 func (r *RpnCalc) unaryOp(f func(float64, string) (float64, error)) error {
 	v, err := f(r.stack[0], "")
@@ -44,5 +47,26 @@ func opSquareRoot(r *RpnCalc, _ string) error {
 			return 0.0, errNaN
 		}
 		return r, nil
+	})
+}
+
+func opDecToBin(r *RpnCalc, _ string) error {
+	return r.unaryOp(func(x float64, _ string) (float64, error) {
+		dec := int64(x)
+		bin := int64(0)
+		i := 0
+
+		for dec > 0 {
+			lastBin := bin
+			bin += int64(math.Pow10(i)) * (dec % int64(2))
+			dec = dec / 2
+			i++
+			if lastBin > bin {
+				log.Println("error overflow")
+				return 0.0, errOverflow
+			}
+		}
+
+		return float64(bin), nil
 	})
 }

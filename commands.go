@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"../rpncalc"
+	"github.com/callerobertsson/rpn/rpncalc"
 )
 
 type command struct {
@@ -150,7 +150,7 @@ func cmdHistory(r *rpncalc.RpnCalc, args []string) error {
 		}
 		err := ioutil.WriteFile(args[2], []byte(strings.Join(r.Log(), "\n")+"\n"), 0644)
 		if err != nil {
-			return fmt.Errorf("could not write log to %q\n", args[2])
+			return fmt.Errorf("could not write log to %q", args[2])
 		}
 		return nil
 	}
