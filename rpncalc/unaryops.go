@@ -2,7 +2,6 @@
 package rpncalc
 
 import (
-	"log"
 	"math"
 )
 
@@ -62,7 +61,6 @@ func opDecToBin(r *RpnCalc, _ string) error {
 			dec = dec / 2
 			i++
 			if lastBin > bin {
-				log.Println("error overflow")
 				return 0.0, errOverflow
 			}
 		}
