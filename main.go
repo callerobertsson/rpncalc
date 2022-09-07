@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -36,8 +37,15 @@ func main() {
 		// Read input line
 		line, err := rl.Readline()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Reading input line failed:", err)
-			os.Exit(1)
+			switch err {
+			case io.EOF:
+				line = ""
+			case readline.ErrInterrupt:
+				line = "quit"
+			default:
+				fmt.Fprintln(os.Stderr, "Reading input line failed:", err)
+				os.Exit(1)
+			}
 		}
 		line = strings.TrimSpace(line)
 		args := strings.Split(line, " ")
