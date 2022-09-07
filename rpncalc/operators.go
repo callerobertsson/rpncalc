@@ -43,7 +43,8 @@ var operators = []Operator{
 	{StaticOp, []string{"inv"}, "", opInverse, "Inverts (1/x) first value on stack"},
 	{StaticOp, []string{"sq", "square"}, "", opSquare, "Squares (x^2) first value on stack"},
 	{StaticOp, []string{"sqrt", "root"}, "", opSquareRoot, "Calulates the square root"},
-	{StaticOp, []string{"dec2bin", "d2b"}, "", opDecToBin, "Converts decimal to binary"},
+	{StaticOp, []string{"bin", "b"}, "", opDecToBin, "Converts decimal to binary"},
+	{StaticOp, []string{"dec", "d"}, "", opBinToDec, "Converts binary to decimal"},
 	// Binary
 	{StaticOp, []string{"+", "add"}, "", opAddition, "Adds (x+y) first two values on stack"},
 	{StaticOp, []string{"-", "sub"}, "", opSubtraction, "Subtracts (y-x) first two values on stack"},

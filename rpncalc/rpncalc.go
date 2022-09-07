@@ -37,6 +37,7 @@ var (
 	errInvalidRegister = errors.New("invalid register")
 	errUnknownInput    = errors.New("unknown input")
 	errValueNotAllowed = errors.New("value not allowed")
+	errNoBinaryNumber  = errors.New("value is not a binary number")
 )
 
 // RpnCalc implements a RPN calculator adhering to the RpnCalcer interface

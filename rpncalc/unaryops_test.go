@@ -59,6 +59,11 @@ func TestUnaryOpBasicOperations(t *testing.T) {
 		{"dec 256 as bin", opDecToBin, 256, 100000000, nil},
 		{"dec 678901234 as bin", opDecToBin, 67890, 10000100100110010, nil},
 		{"dec to bin overflow", opDecToBin, 6789012345, 0, errOverflow},
+		{"bin 0 to dec", opBinToDec, 0, 0, nil},
+		{"bin 1 to dec", opBinToDec, 1, 1, nil},
+		{"bin 10 to dec", opBinToDec, 10, 2, nil},
+		{"bin 1001001 to dec", opBinToDec, 1001001, 73, nil},
+		{"bin to dec not a binary number", opBinToDec, 123, 0, errNoBinaryNumber},
 
 		// TODO: Add more cases for unary operators
 	}

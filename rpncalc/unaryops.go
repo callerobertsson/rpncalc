@@ -3,6 +3,8 @@ package rpncalc
 
 import (
 	"math"
+	"strconv"
+	"strings"
 )
 
 func (r *RpnCalc) unaryOp(f func(float64, string) (float64, error)) error {
@@ -66,5 +68,25 @@ func opDecToBin(r *RpnCalc, _ string) error {
 		}
 
 		return float64(bin), nil
+	})
+}
+
+func opBinToDec(r *RpnCalc, _ string) error {
+	return r.unaryOp(func(x float64, _ string) (float64, error) {
+		bin := int64(x)
+		dec := int64(0)
+		i := 0
+
+		if "" != strings.ReplaceAll(strings.ReplaceAll(strconv.FormatInt(bin, 10), "1", ""), "0", "") {
+			return 0.0, errNoBinaryNumber
+		}
+
+		for bin >= 1 {
+			dec += int64(math.Pow(2, float64(i))) * (bin % 10)
+			bin = bin / 10
+			i++
+		}
+
+		return float64(dec), nil
 	})
 }
