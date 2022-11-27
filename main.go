@@ -21,10 +21,21 @@ var config = struct {
 }
 
 func main() {
+	r := rpncalc.New()
+
+	if len(os.Args) > 1 {
+		err := calculate(r, strings.Join(os.Args[1:], " "))
+		if err != nil {
+			fmt.Printf("Error: %s\n", err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Printf("%f\n", r.Stack()[0])
+		os.Exit(0)
+	}
+
 	fmt.Println("Simple RPN Calculator")
 	fmt.Println(`enter "help" for help or "quit" to quit`)
-
-	r := rpncalc.New()
 
 	// Create input line reader
 	rl, err := readline.New(prompt(r, ""))
@@ -47,19 +58,8 @@ func main() {
 				os.Exit(1)
 			}
 		}
-		line = strings.TrimSpace(line)
-		args := strings.Split(line, " ")
-		args = filter(args, func(x string) bool { return x != "" })
 
-		// Choose what to do
-		switch {
-		case len(args) < 1:
-			continue
-		case isCommand(args[0]):
-			err = doCommand(r, args)
-		default:
-			err = r.Enter(line)
-		}
+		err = calculate(r, line)
 
 		// Add error message to prompt, if it exists
 		msg := ""
@@ -69,6 +69,24 @@ func main() {
 
 		rl.SetPrompt(prompt(r, msg))
 	}
+}
+
+func calculate(r *rpncalc.RpnCalc, line string) (err error) {
+	line = strings.TrimSpace(line)
+	args := strings.Split(line, " ")
+	args = filter(args, func(x string) bool { return x != "" })
+
+	// Choose what to do
+	switch {
+	case len(args) < 1:
+		return err
+	case isCommand(args[0]):
+		err = doCommand(r, args)
+	default:
+		err = r.Enter(line)
+	}
+
+	return err
 }
 
 func prompt(r *rpncalc.RpnCalc, msg string) (p string) {
