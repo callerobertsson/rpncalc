@@ -113,6 +113,9 @@ func cmdSetting(r *rpncalc.RpnCalc, args []string) error {
 				if err != nil {
 					return fmt.Errorf("precision value is not a number")
 				}
+				if p < 0 {
+					return fmt.Errorf("negative precision is not allowed")
+				}
 				config.DisplayPrecision = p
 			}
 			fmt.Printf(f, "prec", config.DisplayPrecision)
