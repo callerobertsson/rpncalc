@@ -17,6 +17,11 @@ var constants = map[string]float64{
 	// TODO: add constants
 }
 
+// Constants returns a string float map of constant name and value.
+func Constants() map[string]float64 {
+	return constants
+}
+
 func (r *RpnCalc) pushConstant(name string) bool {
 
 	if val, ok := constants[name]; ok {

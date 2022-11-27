@@ -188,6 +188,11 @@ func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 		ops += fmt.Sprintf(format, cmds, op.Description)
 	}
 
+	consts := ""
+	for k, v := range rpncalc.Constants() {
+		consts += fmt.Sprintf(format, k, v)
+	}
+
 	fmt.Printf(`
 RPN Calc Help
 
@@ -217,7 +222,10 @@ List of operators:
 
 %v
 
-`, cmds, ops)
+List of constants:
+
+%v
+`, cmds, ops, consts)
 
 	return nil
 }
