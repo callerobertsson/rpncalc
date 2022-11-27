@@ -10,7 +10,7 @@ import (
 
 // RpnCalcer defines the interface for a RpnCalc
 type RpnCalcer interface {
-	Enter(string) error
+	Evaluate(string) error
 	Val() (float64, error)
 	Stack() []float64
 	Regs() []float64
@@ -58,8 +58,8 @@ func New() *RpnCalc {
 	return r
 }
 
-// Enter takes some input, number, operator, or command, and tries to parse it
-func (r *RpnCalc) Enter(input string) error {
+// Evaluate takes some input, number, operator, or command, and tries to parse it
+func (r *RpnCalc) Evaluate(input string) error {
 
 	input = strings.TrimSpace(input)
 

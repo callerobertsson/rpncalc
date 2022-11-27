@@ -24,13 +24,12 @@ func main() {
 	r := rpncalc.New()
 
 	if len(os.Args) > 1 {
-		err := calculate(r, strings.Join(os.Args[1:], " "))
+		err := calculate(r, strings.Join(os.Args[1:], " "), true)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err.Error())
 			os.Exit(1)
 		}
 
-		fmt.Printf("%f\n", r.Stack()[0])
 		os.Exit(0)
 	}
 
@@ -59,7 +58,7 @@ func main() {
 			}
 		}
 
-		err = calculate(r, line)
+		err = calculate(r, line, false)
 
 		// Add error message to prompt, if it exists
 		msg := ""
@@ -71,19 +70,32 @@ func main() {
 	}
 }
 
-func calculate(r *rpncalc.RpnCalc, line string) (err error) {
-	line = strings.TrimSpace(line)
-	args := strings.Split(line, " ")
-	args = filter(args, func(x string) bool { return x != "" })
+func calculate(r *rpncalc.RpnCalc, input string, outputResult bool) (err error) {
 
-	// Choose what to do
-	switch {
-	case len(args) < 1:
-		return err
-	case isCommand(args[0]):
-		err = doCommand(r, args)
-	default:
-		err = r.Enter(line)
+	// Split multi statements
+	lines := strings.Split(input, ":")
+
+	// Handle each statement
+	for _, line := range lines {
+		line := strings.TrimSpace(line)
+		args := strings.Split(line, " ")
+		args = filter(args, func(x string) bool { return x != "" })
+
+		// Choose what to do
+		switch {
+		case len(args) < 1:
+			return err
+		case isCommand(args[0]):
+			err = doCommand(r, args)
+		default:
+			err = r.Evaluate(line)
+			if err == nil && outputResult {
+				fmt.Printf("%s\n", formatVal(r.Val()))
+				if config.ShowStack {
+					cmdStack(r, []string{"s"}) // reuse stack command
+				}
+			}
+		}
 	}
 
 	return err

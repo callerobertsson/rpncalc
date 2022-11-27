@@ -105,9 +105,9 @@ func TestEnterVal(t *testing.T) {
 
 		var err error
 
-		// Enter all input data
+		// Evaluate all input data
 		for i := 0; i < len(c.input)-1; i++ {
-			err = r.Enter(c.input[i])
+			err = r.Evaluate(c.input[i])
 			if err != nil {
 				t.Errorf("%q: Error in step %d: %v", c.name, i, err)
 				break
@@ -118,8 +118,8 @@ func TestEnterVal(t *testing.T) {
 			continue
 		}
 
-		// Enter final operation
-		err = r.Enter(c.input[len(c.input)-1])
+		// Evaluate final operation
+		err = r.Evaluate(c.input[len(c.input)-1])
 		if err != c.err {
 			t.Errorf("%q: Expected error %v, but got %v for %v", c.name, c.err, err, c.input[len(c.input)-1])
 			continue
@@ -139,7 +139,7 @@ func TestValAndClear(t *testing.T) {
 
 	r := New()
 
-	err := r.Enter("1 2 3 4")
+	err := r.Evaluate("1 2 3 4")
 	if err != nil {
 		t.Fatalf("Could not enter expression, got error %v", err)
 	}
@@ -163,7 +163,7 @@ func TestLogContentAndClear(t *testing.T) {
 
 	r := New()
 
-	err := r.Enter("1 2 + 3 + 0 inv")
+	err := r.Evaluate("1 2 + 3 + 0 inv")
 	if err != errDivisionByZero {
 		t.Fatalf("Expected error %v, got error %v", errDivisionByZero, err)
 	}
@@ -184,7 +184,7 @@ func TestRegsAndClear(t *testing.T) {
 
 	r := New()
 
-	err := r.Enter("1 rs1 2 rs2")
+	err := r.Evaluate("1 rs1 2 rs2")
 	if err != nil {
 		t.Fatalf("Faild to set valid registers, got error %v", err)
 	}
@@ -225,17 +225,17 @@ func TestInvalidRegisters(t *testing.T) {
 
 	r := New()
 
-	err := r.Enter("1 rs10")
+	err := r.Evaluate("1 rs10")
 	if err == nil {
 		t.Fatalf("Could set register 10, that should not be allowed")
 	}
 
-	err = r.Enter("rsapa")
+	err = r.Evaluate("rsapa")
 	if err == nil {
 		t.Fatalf("Could set register apa, that should not be allowed")
 	}
 
-	err = r.Enter("rs")
+	err = r.Evaluate("rs")
 	if err == nil {
 		t.Fatalf("Could set register with empty number, that should not be allowed")
 	}
