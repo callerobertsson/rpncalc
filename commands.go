@@ -199,13 +199,19 @@ List of commands:
 
 OPERATORS AND VALUES
 
-Operators and values can be entered one per line or as a sequence of tokens separated by space.
+Statements (operators and values) can be entered one per line or as a sequence of tokens separated by space.
 
-Caluclations are performed using Reverse Polish Notation (RPN).
+Calculations are performed using Reverse Polish Notation (RPN).
+
+Multiple statments and commands an be separated by a colon, " : ". Example:
+    $ rpn 14 3 : stack : +
+
+The above will push 14 and 3 on the stack, print the stack, and finally add them together.
+
+Input can be piped into rpn. Like:
+    $ rpn < my-file-with-calculations
 
 Unary operators will act on the first element in the stack, binary on the first two elements.
-
-TODO: Enter more help information...
 
 List of operators:
 
