@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,10 +25,29 @@ func main() {
 	r := rpncalc.New()
 
 	if len(os.Args) > 1 {
-		err := calculate(r, strings.Join(os.Args[1:], " "), true)
+		// Evaluate command line arguments as multi statements
+		line := strings.Join(os.Args[1:], " ")
+		err := calculate(r, line, true)
 		if err != nil {
-			fmt.Printf("Error: %s\n", err.Error())
+			fmt.Fprintf(os.Stderr, "Error: %s\n\t%s\n", err.Error(), line)
 			os.Exit(1)
+		}
+
+		os.Exit(0)
+	}
+
+	stat, _ := os.Stdin.Stat()
+	if stat.Mode()&os.ModeCharDevice == 0 {
+		// Read from stdin
+		scanner := bufio.NewScanner(os.Stdin)
+
+		for row := 1; scanner.Scan(); row++ {
+			line := scanner.Text()
+			err := calculate(r, line, true)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error on line %d: %s\n\t%s\n", row, err.Error(), line)
+				os.Exit(10)
+			}
 		}
 
 		os.Exit(0)
