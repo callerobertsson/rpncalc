@@ -72,8 +72,14 @@ func (r *RpnCalc) Evaluate(input string) error {
 	// Split input into tokens
 	ts := strings.Split(input, " ")
 	for _, t := range ts {
-		t = strings.ToLower(strings.TrimSpace(t))
+		t = strings.TrimSpace(t)
 		if t == "" {
+			continue
+		}
+
+		// Handle constants
+		found := r.pushConstant(t)
+		if found {
 			continue
 		}
 
@@ -87,7 +93,7 @@ func (r *RpnCalc) Evaluate(input string) error {
 		}
 
 		// Match static operators, unary and binary
-		found, err := executeOp(r, t)
+		found, err = executeOp(r, t)
 		if err != nil {
 			return err
 		}

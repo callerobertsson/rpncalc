@@ -14,11 +14,13 @@ import (
 )
 
 var config = struct {
-	DisplayPrecision int  `json:"prec"`
-	ShowStack        bool `json:"showstack"`
+	DisplayPrecision   int    `json:"prec"`
+	ShowStack          bool   `json:"showstack"`
+	StatementSeparator string `json:"statmentseparator"`
 }{
-	DisplayPrecision: 2,
-	ShowStack:        false,
+	DisplayPrecision:   2,
+	ShowStack:          false,
+	StatementSeparator: ";",
 }
 
 func main() {
@@ -93,7 +95,7 @@ func main() {
 func calculate(r *rpncalc.RpnCalc, input string, outputResult bool) (err error) {
 
 	// Split multi statements
-	lines := strings.Split(input, ":")
+	lines := strings.Split(input, config.StatementSeparator)
 
 	// Handle each statement
 	for _, line := range lines {
