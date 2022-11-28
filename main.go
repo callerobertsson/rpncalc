@@ -20,7 +20,7 @@ var config = struct {
 }{
 	DisplayPrecision:   2,
 	ShowStack:          false,
-	StatementSeparator: ";",
+	StatementSeparator: ":",
 }
 
 func main() {
