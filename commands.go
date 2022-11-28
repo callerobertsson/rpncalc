@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -189,8 +190,16 @@ func cmdHelp(r *rpncalc.RpnCalc, _ []string) error {
 	}
 
 	consts := ""
-	for k, v := range rpncalc.Constants() {
-		consts += fmt.Sprintf(format, k, v)
+	for _, c := range rpncalc.Constants() {
+		val := strconv.FormatFloat(c.Value, 'f', 4, 64)
+		if c.Value > math.Pow(10.0, 100) {
+			val = strconv.FormatFloat(c.Value, 'E', 4, 64)
+		}
+		numdec := strings.Split(val, ".")
+		if len(numdec) > 1 && numdec[1] == "0000" {
+			val = numdec[0]
+		}
+		consts += fmt.Sprintf(format, strings.Join(c.Names, ", "), fmt.Sprintf("%s, %s", val, c.Description))
 	}
 
 	fmt.Printf(`
