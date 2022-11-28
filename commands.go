@@ -208,7 +208,7 @@ Statements (operators and values) can be entered one per line or as a sequence o
 
 Calculations are performed using Reverse Polish Notation (RPN).
 
-Multiple statments and commands an be separated by a colon, " : ". Example:
+Multiple statments and commands an be separated by a configurable string, default " : ". Example:
     $ rpn 14 3 : stack : +
 
 The above will push 14 and 3 on the stack, print the stack, and finally add them together.
@@ -221,6 +221,8 @@ Unary operators will act on the first element in the stack, binary on the first 
 List of operators:
 
 %v
+
+CONSTANTS
 
 List of constants:
 
